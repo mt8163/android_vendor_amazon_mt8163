@@ -1,0 +1,4 @@
+service vendor.light-hal-2-0-mtk /vendor/bin/hw/android.hardware.light@2.0-service.mtk
+    class hal
+    user system
+    group system

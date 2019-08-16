@@ -1,0 +1,4 @@
+service vendor.thermal-hal-1-0-mtk /vendor/bin/hw/android.hardware.thermal@1.0-service.mtk
+    class hal
+    user system
+    group system

@@ -1,0 +1,43 @@
+cc_binary {
+    name: "android.hardware.sensors@1.0-service.mtk",
+    init_rc: ["android.hardware.sensors@1.0-service.mtk.rc"],
+    defaults: ["hidl_defaults"],
+    proprietary: true,
+    relative_install_path: "hw",
+    srcs: ["service.cpp"],
+    shared_libs: [
+        "liblog",
+        "libcutils",
+        "libdl",
+        "libbase",
+        "libutils",
+	"libhidlbase",
+	"libhidltransport",
+        "android.hardware.sensors@1.0",
+    ],
+}
+
+cc_library_shared {
+    name: "android.hardware.sensors@1.0-impl.mtk",
+    defaults: ["hidl_defaults"],
+    proprietary: true,
+    relative_install_path: "hw",
+    srcs: ["Sensors.cpp"],
+    shared_libs: [
+        "liblog",
+        "libcutils",
+        "libhardware",
+        "libbase",
+        "libutils",
+        "libhidlbase",
+        "libhidltransport",
+        "android.hardware.sensors@1.0",
+    ],
+    static_libs: [
+        "android.hardware.sensors@1.0-convert",
+        "multihal",
+    ],
+    local_include_dirs: ["include/sensors"],
+}
+
+
