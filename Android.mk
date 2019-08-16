@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-ifeq ($(TARGET_BOARD_PLATFORM ),mt8173)
+ifeq ($(TARGET_BOARD_PLATFORM ),mt8163)
 
 LOCAL_PATH := $(call my-dir)
 

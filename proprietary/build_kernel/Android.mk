@@ -15,5 +15,9 @@
 LOCAL_MODULE := build_kernel
 LOCAL_PATH := $(call my-dir)
 
+ifeq ($(PRODUCT_PACKAGES ),build_kernel)
+$(shell ./build_kernel.sh)
+endif
+
 
 
