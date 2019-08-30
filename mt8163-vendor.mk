@@ -14,3 +14,7 @@
 # limitations under the License.
 #
 
+
+# Thermal Manager
+PRODUCT_PARCKAGES += \
+     thermal_manager
