@@ -14,7 +14,14 @@
 # limitations under the License.
 #
 
+LOCAL_PATH_VENDOR := vendor/amazon/mt8163
 
 # Thermal Manager
 PRODUCT_PARCKAGES += \
      thermal_manager
+
+
+# Debug Tool
+PRODUCT_COPY_FILES += \
+	$(LOCAL_PATH_VENDOR)/proprietary/debug/debug_tool:$(TARGET_COPY_OUT_VENDOR)/bin/debug_tool
+
