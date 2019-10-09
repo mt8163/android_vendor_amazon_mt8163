@@ -14,3 +14,5 @@
 # limitations under the License.
 #
 
+TARGET_BOOTLOADER_BOARD_NAME := mt8163
+
