@@ -1,24 +1,24 @@
 #!/bin/bash
 log_dir=/data/misc/logging/
-su=/system/xbin/su
 sdcard_path=/sdcard/
-device=getprop ro.product.brand
+device=mt8163-generic
 d=$(date +%Y-%m-%d)
-LOG=/data/misc/logging/amz/
+LOG=/data/misc/logging/amz
 command="$1"
-
-function -tb {
-mdkir -p $dcard_path/tmp
-bugreport > $sdcard_path/tmp/bugreport-$device-$d.log
-timeout 10 logcat > $sdcard_path/tmp/logcat.log
-getprop > $sdcard_path/tmp/properties.prop
--p
-cp -r $LOG $sdcard_path/tmp/
-tar -zcf bugreport-$device-$d.tar.gz $sdcard_path/tmp
-mv $sdcard_path/tmp/bugreport-$device-$d.tar.gz /sdcard
-rm -rf $LOG $sdcard_path/tmp
+function -h {
+echo " -i start the logging for init"
+echo " -tb take a bug report and send it to the sd card"
+echo " -h show this documentation"
+echo " -e export the bugreport data to /sdcard to the zip file"
+echo " -p take the boot report"
 }
 
+function -i {
+mkdir -p $log_dir
+mdkir -p $sdcard_path
+rm -rf $LOG
+mkdir -p $LOG
+}
 
 function -p {
 cat /proc/last_kmsg >$LOG/SYSTEM_LAST_KMSG
@@ -27,27 +27,22 @@ mkdir -p $LOG/tmp
 idme print > $LOG/IDME
 }
 
-
-
-function -help {
-echo " -i start the logging for init"
-echo " -tb take a bug report and send it to the sd card"
-echo " -h show this documentation"
-echo " -e export the bugreport data to /sdcard to the zip file"
-echo " -p take the boot report"
+function -tb {
+-i
+mdkir -p $sdcard_path/tmp
+bugreport > $sdcard_path/tmp/bugreport-$device-$d.log
+timeout 10 logcat > $sdcard_path/tmp/logcat.log
+getprop > $sdcard_path/tmp/properties.prop
+-p
+cp -r $LOG $sdcard_path/tmp/
+tar -zcf bugreport-$device-$d.tar.gz $sdcard_path/tmp
+mv $sdcard_path/tmp/bugreport-$device-$d.tar.gz /sdcard
+rm -rf $sdcard_path/tmp
+cleanup
 }
 
+function cleanup {
+rm -rf /data/misc/logging/amz
 
 
-
-function -i {
-mkdir -p $log_dir
-mdkir -p $dcard_path
-rm -rf $LOG
-mkdir -p $LOG
-}
-
-
-
-
-$command
+$commands
