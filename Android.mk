@@ -14,10 +14,6 @@
 # limitations under the License.
 #
 
-ifeq ($(TARGET_BOARD_PLATFORM ),mt8163)
-
 LOCAL_PATH := $(call my-dir)
 
 include $(call all-makefiles-under,$(LOCAL_PATH))
-
-endif
