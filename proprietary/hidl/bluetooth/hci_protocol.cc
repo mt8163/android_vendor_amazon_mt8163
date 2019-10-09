@@ -16,11 +16,14 @@
 
 #include "hci_protocol.h"
 
-#define LOG_TAG "android.hardware.bluetooth-hci-hci_protocol"
-#include <assert.h>
+#define LOG_TAG "mtk.hal.bt-hci-hci_protocol"
+
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
+
+#include <thread>
+
 #include <log/log.h>
 
 namespace android {
@@ -35,7 +38,12 @@ size_t HciProtocol::WriteSafely(int fd, const uint8_t* data, size_t length) {
         TEMP_FAILURE_RETRY(write(fd, data + transmitted_length, length));
 
     if (ret == -1) {
-      if (errno == EAGAIN) continue;
+      if (errno == EAGAIN) {
+        // According to requirement from driver, it has to do delay before retry right away here
+        // std::this_thread::yield() is suggested to use to avoid thread busy writing
+        std::this_thread::yield();
+        continue;
+      }
       ALOGE("%s error writing to UART (%s)", __func__, strerror(errno));
       break;
 
@@ -47,6 +55,49 @@ size_t HciProtocol::WriteSafely(int fd, const uint8_t* data, size_t length) {
 
     transmitted_length += ret;
     length -= ret;
+  }
+
+  return transmitted_length;
+}
+
+size_t HciProtocol::WritevSafely(int fd, struct iovec* iov, int iovcnt) {
+  LOG_ALWAYS_FATAL_IF((-1 == fd), "%s: invalid fd!", __func__);
+  LOG_ALWAYS_FATAL_IF((NULL == iov), "%s: invalid fd!", __func__);
+
+  size_t transmitted_length = 0;
+  while (iovcnt > 0) {
+    ssize_t ret =
+        TEMP_FAILURE_RETRY(writev(fd, iov, iovcnt));
+
+    if (ret == -1) {
+      if (errno == EAGAIN) {
+        // According to requirement from driver, it has to do delay before retry right away here
+        // std::this_thread::yield() is suggested to use to avoid thread busy writing
+        std::this_thread::yield();
+        continue;
+      }
+      ALOGE("%s error writing to UART (%s)", __func__, strerror(errno));
+      break;
+    } else if (ret == 0) {
+      // Nothing written :(
+      ALOGE("%s zero bytes written - something went wrong...", __func__);
+      break;
+    }
+
+    transmitted_length += ret;
+
+    while (static_cast<size_t>(ret) >= iov->iov_len) {
+      // consume entire iovec
+      ret -= iov->iov_len;
+      --iovcnt;
+      ++iov;
+    }
+
+    if (ret > 0) {
+      // consume partial iovec
+      iov->iov_len -= ret;
+      iov->iov_base = static_cast<uint8_t*>(iov->iov_base) + ret;
+    }
   }
 
   return transmitted_length;

@@ -16,13 +16,14 @@
 
 #include "hci_packetizer.h"
 
-#define LOG_TAG "android.hardware.bluetooth.hci_packetizer"
+#define LOG_TAG "mtk.hal.bt.hci_packetizer"
 
 #include <dlfcn.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <utils/Log.h>
+
+#include <log/log.h>
 
 namespace {
 

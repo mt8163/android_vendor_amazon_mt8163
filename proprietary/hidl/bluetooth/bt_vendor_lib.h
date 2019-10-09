@@ -426,9 +426,6 @@ typedef struct
     uint16_t          layer_specific;
     uint8_t           data[];
 } HC_BT_HDR;
-
-#define BT_HC_HDR_SIZE (sizeof(HC_BT_HDR))
-#define MSG_STACK_TO_HC_HCI_CMD 0x2000 /* eq. BT_EVT_TO_LM_HCI_CMD */
 // /MODIFICATION
 
 #ifdef __cplusplus

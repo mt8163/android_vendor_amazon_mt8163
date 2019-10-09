@@ -50,6 +50,8 @@ class BluetoothHci : public IBluetoothHci {
   std::function<void(sp<BluetoothDeathRecipient>&)> unlink_cb_;
 };
 
+extern "C" IBluetoothHci* HIDL_FETCH_IBluetoothHci(const char* name);
+
 }  // namespace implementation
 }  // namespace V1_0
 }  // namespace bluetooth

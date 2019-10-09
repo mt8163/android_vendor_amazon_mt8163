@@ -14,9 +14,13 @@
 // limitations under the License.
 //
 
-#define LOG_TAG "android.hardware.bluetooth@1.0-impl"
+#define LOG_TAG "mtk.hal.bt@1.0-impl"
 
 #include "async_fd_watcher.h"
+
+#include <fcntl.h>
+#include <sys/select.h>
+#include <unistd.h>
 
 #include <algorithm>
 #include <atomic>
@@ -24,11 +28,9 @@
 #include <map>
 #include <mutex>
 #include <thread>
-#include <log/log.h>
 #include <vector>
-#include "fcntl.h"
-#include "sys/select.h"
-#include "unistd.h"
+
+#include <log/log.h>
 
 static const int INVALID_FD = -1;
 
@@ -67,6 +69,12 @@ int AsyncFdWatcher::ConfigureTimeout(
 
 void AsyncFdWatcher::StopWatchingFileDescriptors() { stopThread(); }
 
+AsyncFdWatcher::AsyncFdWatcher()
+    : notification_listen_fd_(INVALID_FD),
+      notification_write_fd_(INVALID_FD),
+      timeout_cb_(nullptr),
+      timeout_ms_(std::chrono::milliseconds(0)) {}
+
 AsyncFdWatcher::~AsyncFdWatcher() {}
 
 // Make sure to call this with at least one file descriptor ready to be
@@ -104,6 +112,9 @@ int AsyncFdWatcher::stopThread() {
     std::unique_lock<std::mutex> guard(timeout_mutex_);
     timeout_cb_ = nullptr;
   }
+
+  close(notification_listen_fd_);
+  close(notification_write_fd_);
 
   return 0;
 }

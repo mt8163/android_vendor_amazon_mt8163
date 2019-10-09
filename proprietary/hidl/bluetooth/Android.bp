@@ -12,32 +12,83 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-cc_binary {
-    name: "android.hardware.bluetooth@1.0-service.mtk",
-    init_rc: ["android.hardware.bluetooth@1.0-service.mtk.rc"],
-    relative_install_path: "hw",
+
+cc_library_shared {
+    name: "android.hardware.bluetooth@1.0-impl-mediatek",
     defaults: ["hidl_defaults"],
+    vendor: true,
+    relative_install_path: "hw",
     srcs: [
-	"service.cpp",
         "bluetooth_hci.cc",
         "vendor_interface.cc",
-        "radiomod.c",
     ],
     shared_libs: [
         "android.hardware.bluetooth@1.0",
         "libbase",
         "libcutils",
         "libhardware",
-        "libdl",
         "libhidlbase",
         "libhidltransport",
         "liblog",
         "libutils",
-        "libnvram",
     ],
     static_libs: [
-        "android.hardware.bluetooth-async",
-        "android.hardware.bluetooth-hci",
+        "android.hardware.bluetooth-async-mediatek",
+        "android.hardware.bluetooth-hci-mediatek",
     ],
+}
+
+cc_library_static {
+    name: "android.hardware.bluetooth-async-mediatek",
+    vendor: true,
+    defaults: ["hidl_defaults"],
+    srcs: [
+        "async_fd_watcher.cc",
+    ],
+    export_include_dirs: ["."],
+    shared_libs: [
+        "liblog",
+    ],
+}
+
+cc_binary {
+    name: "android.hardware.bluetooth@1.0-service-mediatek",
+    relative_install_path: "hw",
     proprietary: true,
+    owner: "mtk",
+    init_rc: ["android.hardware.bluetooth@1.0-service-mediatek.rc"],
+    srcs: ["service.cpp"],
+
+    shared_libs: [
+        "liblog",
+        "libcutils",
+        "libdl",
+        "libbase",
+        "libutils",
+        "libhardware",
+    ] + [
+        "libhidlbase",
+        "libhidltransport",
+        "android.hardware.bluetooth@1.0",
+    ],
+}
+
+
+cc_library_static {
+    name: "android.hardware.bluetooth-hci-mediatek",
+    vendor: true,
+    defaults: ["hidl_defaults"],
+    srcs: [
+        "hci_packetizer.cc",
+        "hci_protocol.cc",
+        "h4_protocol.cc",
+        "mct_protocol.cc",
+    ],
+    export_include_dirs: ["."],
+    shared_libs: [
+        "libbase",
+        "libhidlbase",
+        "liblog",
+        "libutils",
+    ],
 }

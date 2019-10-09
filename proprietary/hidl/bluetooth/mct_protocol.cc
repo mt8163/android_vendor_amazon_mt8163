@@ -16,12 +16,11 @@
 
 #include "mct_protocol.h"
 
-#include <assert.h>
-
-#define LOG_TAG "android.hardware.bluetooth-hci-mct"
-#include <utils/Log.h>
+#define LOG_TAG "mtk.hal.bt-hci-mct"
 
 #include <fcntl.h>
+
+#include <log/log.h>
 
 namespace android {
 namespace hardware {

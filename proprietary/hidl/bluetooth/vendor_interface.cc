@@ -16,19 +16,21 @@
 
 #include "vendor_interface.h"
 
-#define LOG_TAG "android.hardware.bluetooth@1.0-impl"
-#include <cutils/properties.h>
-#include <utils/Log.h>
-
+#define LOG_TAG "mtk.hal.bt@1.0-impl"
 #include <dlfcn.h>
 #include <fcntl.h>
 
+#include <cutils/properties.h>
+#include <log/log.h>
+
 #include "h4_protocol.h"
 #include "mct_protocol.h"
-#include "bt_mtk.h"
+
+static const char* VENDOR_LIBRARY_NAME = "libbt-vendor.so";
+static const char* VENDOR_LIBRARY_SYMBOL_NAME =
+    "BLUETOOTH_VENDOR_LIB_INTERFACE";
 
 static const int INVALID_FD = -1;
-int fd_list[CH_MAX] = {0};
 
 namespace {
 
@@ -76,18 +78,7 @@ bool internal_command_event_match(const hidl_vec<uint8_t>& packet) {
   return opcode == internal_command.opcode;
 }
 
-extern "C" void* alloc_buffer(int size) {
-  void* p = new uint8_t[size];
-  ALOGV("%s pts: %p, size: %d", __func__, p, size);
-  return p;
-}
-
-extern "C" void free_buffer(void* buffer) {
-  ALOGV("%s ptr: %p", __func__, buffer);
-  delete[] reinterpret_cast<uint8_t*>(buffer);
-}
-
-extern "C" uint8_t transmit_old(uint16_t opcode, void* buffer, tINT_CMD_CBACK callback) {
+uint8_t transmit_cb(uint16_t opcode, void* buffer, tINT_CMD_CBACK callback) {
   ALOGV("%s opcode: 0x%04x, ptr: %p, cb: %p", __func__, opcode, buffer,
         callback);
   internal_command.cb = callback;
@@ -99,11 +90,50 @@ extern "C" uint8_t transmit_old(uint16_t opcode, void* buffer, tINT_CMD_CBACK ca
   return true;
 }
 
-extern "C" void callFirmwareConfigured(uint8_t result) {
+void firmware_config_cb(bt_vendor_op_result_t result) {
+  ALOGV("%s result: %d", __func__, result);
   VendorInterface::get()->OnFirmwareConfigured(result);
 }
 
-} //namespace
+void sco_config_cb(bt_vendor_op_result_t result) {
+  ALOGD("%s result: %d", __func__, result);
+}
+
+void low_power_mode_cb(bt_vendor_op_result_t result) {
+  ALOGD("%s result: %d", __func__, result);
+}
+
+void sco_audiostate_cb(bt_vendor_op_result_t result) {
+  ALOGD("%s result: %d", __func__, result);
+}
+
+void* buffer_alloc_cb(int size) {
+  void* p = new uint8_t[size];
+  ALOGV("%s pts: %p, size: %d", __func__, p, size);
+  return p;
+}
+
+void buffer_free_cb(void* buffer) {
+  ALOGV("%s ptr: %p", __func__, buffer);
+  delete[] reinterpret_cast<uint8_t*>(buffer);
+}
+
+void epilog_cb(bt_vendor_op_result_t result) {
+  ALOGD("%s result: %d", __func__, result);
+}
+
+void a2dp_offload_cb(bt_vendor_op_result_t result, bt_vendor_opcode_t op,
+                     uint8_t av_handle) {
+  ALOGD("%s result: %d, op: %d, handle: %d", __func__, result, op, av_handle);
+}
+
+const bt_vendor_callbacks_t lib_callbacks = {
+    sizeof(lib_callbacks), firmware_config_cb, sco_config_cb,
+    low_power_mode_cb,     sco_audiostate_cb,  buffer_alloc_cb,
+    buffer_free_cb,        transmit_cb,        epilog_cb,
+    a2dp_offload_cb};
+
+}  // namespace
 
 namespace android {
 namespace hardware {
@@ -156,26 +186,41 @@ bool VendorInterface::Open(InitializeCompleteCallback initialize_complete_cb,
                            PacketReadCallback sco_cb) {
   initialize_complete_cb_ = initialize_complete_cb;
 
-  // Get the UART socket(s)
-  int fd_count = 1;
-  int retry = 0;
-  
-  fd_list[0] = open("/dev/stpbt", O_RDWR | O_NOCTTY | O_NONBLOCK | O_CLOEXEC);
+  // Initialize vendor interface
 
-  while ((fd_list[0] == INVALID_FD) && (retry < 7)) {
-    ALOGE("Can`t open /dev/stpbt. Retry after 2 seconds");
-    usleep(2000000);
-    fd_list[0] = open("/dev/stpbt", O_RDWR | O_NOCTTY | O_NONBLOCK | O_CLOEXEC);
-    retry++;
+  lib_handle_ = dlopen(VENDOR_LIBRARY_NAME, RTLD_NOW);
+  if (!lib_handle_) {
+    ALOGE("%s unable to open %s (%s)", __func__, VENDOR_LIBRARY_NAME,
+          dlerror());
+    return false;
   }
 
-  // The hal will crash either way so do it earlier.
-  LOG_ALWAYS_FATAL_IF(fd_list[0] < 0, "Failed to open /dev/stpbt");
+  lib_interface_ = reinterpret_cast<bt_vendor_interface_t*>(
+      dlsym(lib_handle_, VENDOR_LIBRARY_SYMBOL_NAME));
+  if (!lib_interface_) {
+    ALOGE("%s unable to find symbol %s in %s (%s)", __func__,
+          VENDOR_LIBRARY_SYMBOL_NAME, VENDOR_LIBRARY_NAME, dlerror());
+    return false;
+  }
 
-  /*if (fd_list[0] < 0) {
-   ALOGE("Can't open /dev/stpbt\n");
-   return -1;
-  }*/
+  // BT driver will get BD address from NVRAM for MTK solution
+  int status = lib_interface_->init(&lib_callbacks, NULL);
+  if (status) {
+    ALOGE("%s unable to initialize vendor library: %d", __func__, status);
+    return false;
+  }
+
+  ALOGD("%s vendor library loaded", __func__);
+
+  // Power on the controller
+
+  int power_state = BT_VND_PWR_ON;
+  lib_interface_->op(BT_VND_OP_POWER_CTRL, &power_state);
+
+  // Get the UART socket(s)
+
+  int fd_list[CH_MAX] = {0};
+  int fd_count = lib_interface_->op(BT_VND_OP_USERIAL_OPEN, &fd_list);
 
   if (fd_count < 1 || fd_count > CH_MAX - 1) {
     ALOGE("%s: fd_count %d is invalid!", __func__, fd_count);
@@ -216,7 +261,7 @@ bool VendorInterface::Open(InitializeCompleteCallback initialize_complete_cb,
 
   // Start configuring the firmware
   firmware_startup_timer_ = new FirmwareStartupTimer();
-  mtk_fw_cfg();
+  lib_interface_->op(BT_VND_OP_FW_CFG, nullptr);
 
   return true;
 }
@@ -224,6 +269,11 @@ bool VendorInterface::Open(InitializeCompleteCallback initialize_complete_cb,
 void VendorInterface::Close() {
   // These callbacks may send HCI events (vendor-dependent), so make sure to
   // StopWatching the file descriptor after this.
+  if (lib_interface_ != nullptr) {
+    bt_vendor_lpm_mode_t mode = BT_VND_LPM_DISABLE;
+    lib_interface_->op(BT_VND_OP_LPM_SET_MODE, &mode);
+  }
+
   fd_watcher_.StopWatchingFileDescriptors();
 
   if (hci_ != nullptr) {
@@ -231,12 +281,19 @@ void VendorInterface::Close() {
     hci_ = nullptr;
   }
 
-  if (fd_list[0] != 0 && fd_list[0] != -1) {
-    close(fd_list[0]);
+  if (lib_interface_ != nullptr) {
+    lib_interface_->op(BT_VND_OP_USERIAL_CLOSE, nullptr);
+
+    int power_state = BT_VND_PWR_OFF;
+    lib_interface_->op(BT_VND_OP_POWER_CTRL, &power_state);
+
+    lib_interface_->cleanup();
   }
 
-  //RadioMod cleanup
-  BT_Cleanup();
+  if (lib_handle_ != nullptr) {
+    dlclose(lib_handle_);
+    lib_handle_ = nullptr;
+  }
 
   if (firmware_startup_timer_ != nullptr) {
     delete firmware_startup_timer_;
@@ -253,6 +310,8 @@ size_t VendorInterface::Send(uint8_t type, const uint8_t* data, size_t length) {
                                  [this]() { OnTimeout(); });
     // Assert wake.
     lpm_wake_deasserted = false;
+    bt_vendor_lpm_wake_state_t wakeState = BT_VND_LPM_WAKE_ASSERT;
+    lib_interface_->op(BT_VND_OP_LPM_WAKE_SET_STATE, &wakeState);
     ALOGV("%s: Sent wake before (%02x)", __func__, data[0] | (data[1] << 8));
   }
 
@@ -272,7 +331,11 @@ void VendorInterface::OnFirmwareConfigured(uint8_t result) {
     initialize_complete_cb_ = nullptr;
   }
 
-  lpm_timeout_ms = 5000;
+  lib_interface_->op(BT_VND_OP_GET_LPM_IDLE_TIMEOUT, &lpm_timeout_ms);
+  ALOGI("%s: lpm_timeout_ms %d", __func__, lpm_timeout_ms);
+
+  bt_vendor_lpm_mode_t mode = BT_VND_LPM_ENABLE;
+  lib_interface_->op(BT_VND_OP_LPM_SET_MODE, &mode);
 
   ALOGD("%s Calling StartLowPowerWatchdog()", __func__);
   fd_watcher_.ConfigureTimeout(std::chrono::milliseconds(lpm_timeout_ms),
@@ -283,6 +346,8 @@ void VendorInterface::OnTimeout() {
   ALOGV("%s", __func__);
   if (recent_activity_flag == false) {
     lpm_wake_deasserted = true;
+    bt_vendor_lpm_wake_state_t wakeState = BT_VND_LPM_WAKE_DEASSERT;
+    lib_interface_->op(BT_VND_OP_LPM_WAKE_SET_STATE, &wakeState);
     fd_watcher_.ConfigureTimeout(std::chrono::seconds(0), []() {
       ALOGE("Zero timeout! Should never happen.");
     });

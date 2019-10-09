@@ -18,6 +18,8 @@
 
 #include <hidl/HidlSupport.h>
 
+#include <sys/uio.h>
+
 #include "bt_vendor_lib.h"
 #include "hci_internals.h"
 #include "hci_packetizer.h"
@@ -41,6 +43,7 @@ class HciProtocol {
 
  protected:
   static size_t WriteSafely(int fd, const uint8_t* data, size_t length);
+  static size_t WritevSafely(int fd, struct iovec* iov, int iovcnt);
 };
 
 }  // namespace hci

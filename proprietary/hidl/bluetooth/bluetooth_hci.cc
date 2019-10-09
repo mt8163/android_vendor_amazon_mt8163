@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 
-#define LOG_TAG "android.hardware.bluetooth@1.0-impl"
+#define LOG_TAG "mtk.hal.bt@1.0-impl"
 #include "bluetooth_hci.h"
 
 #include <log/log.h>
@@ -33,7 +33,8 @@ static const uint8_t HCI_DATA_TYPE_SCO = 3;
 
 class BluetoothDeathRecipient : public hidl_death_recipient {
  public:
-  BluetoothDeathRecipient(const sp<IBluetoothHci> hci) : mHci(hci) {}
+  BluetoothDeathRecipient(const sp<IBluetoothHci> hci)
+    : mHci(hci), has_died_(false) {}
 
   virtual void serviceDied(
       uint64_t /*cookie*/,
@@ -132,6 +133,10 @@ Return<void> BluetoothHci::sendScoData(const hidl_vec<uint8_t>& data) {
 void BluetoothHci::sendDataToController(const uint8_t type,
                                         const hidl_vec<uint8_t>& data) {
   VendorInterface::get()->Send(type, data.data(), data.size());
+}
+
+IBluetoothHci* HIDL_FETCH_IBluetoothHci(const char* /* name */) {
+  return new BluetoothHci();
 }
 
 }  // namespace implementation

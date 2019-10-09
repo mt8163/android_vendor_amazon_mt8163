@@ -30,7 +30,7 @@ using TimeoutCallback = std::function<void(void)>;
 
 class AsyncFdWatcher {
  public:
-  AsyncFdWatcher() = default;
+  AsyncFdWatcher();
   ~AsyncFdWatcher();
 
   int WatchFdForNonBlockingReads(int file_descriptor,
