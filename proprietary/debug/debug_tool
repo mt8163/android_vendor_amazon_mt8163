@@ -26,8 +26,8 @@ idme print > $LOG/IDME
 
 function -tb {
 -i
-mdkir -p /sdcard/tmp
-bugreport > /sdcard/tmp/bugreport-$device-$d.log
+mkdir -p /sdcard/tmp
+#bugreport > /sdcard/tmp/bugreport-$device-$d.log disabled because this is causing issues with the device
 timeout 10 logcat > /sdcard/tmp/logcat.log
 getprop > /sdcard/tmp/properties.prop
 -p
