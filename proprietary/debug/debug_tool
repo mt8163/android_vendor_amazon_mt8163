@@ -1,21 +1,19 @@
-#!/bin/bash
+#!/system/bin/sh
 log_dir=/data/misc/logging/
-sdcard_path=/sdcard/
 device=mt8163-generic
 d=$(date +%Y-%m-%d)
 LOG=/data/misc/logging/amz
 command="$1"
 function -h {
-echo " -i start the logging for init"
+echo " -i  start the logging for init"
 echo " -tb take a bug report and send it to the sd card"
-echo " -h show this documentation"
-echo " -e export the bugreport data to /sdcard to the zip file"
-echo " -p take the boot report"
+echo " -h  Show Help Documentation"
+echo " -e  export the bugreport data to /sdcard to the zip file"
+echo " -p  take the hardware info and debug report"
 }
 
 function -i {
 mkdir -p $log_dir
-mdkir -p $sdcard_path
 rm -rf $LOG
 mkdir -p $LOG
 }
@@ -23,26 +21,25 @@ mkdir -p $LOG
 function -p {
 cat /proc/last_kmsg >$LOG/SYSTEM_LAST_KMSG
 cat /proc/life_cycle_reason >$LOG/BOOT_REASON
-mkdir -p $LOG/tmp
 idme print > $LOG/IDME
 }
 
 function -tb {
 -i
-mdkir -p $sdcard_path/tmp
-bugreport > $sdcard_path/tmp/bugreport-$device-$d.log
-timeout 10 logcat > $sdcard_path/tmp/logcat.log
-getprop > $sdcard_path/tmp/properties.prop
+mdkir -p /sdcard/tmp
+bugreport > /sdcard/tmp/bugreport-$device-$d.log
+timeout 10 logcat > /sdcard/tmp/logcat.log
+getprop > /sdcard/tmp/properties.prop
 -p
-cp -r $LOG $sdcard_path/tmp/
-tar -zcf bugreport-$device-$d.tar.gz $sdcard_path/tmp
-mv $sdcard_path/tmp/bugreport-$device-$d.tar.gz /sdcard
-rm -rf $sdcard_path/tmp
+cp -r $LOG /sdcard/tmp/
+tar -zcf bugreport-$device-$d.tar.gz /sdcard//tmp
+mv /sdcard/tmp/bugreport-$device-$d.tar.gz /sdcard/
 cleanup
 }
 
 function cleanup {
 rm -rf /data/misc/logging/amz
+rm -rf /sdcard/tmp/
+}
 
-
-$commands
+$command
