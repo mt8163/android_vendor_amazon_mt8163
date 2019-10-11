@@ -5,10 +5,9 @@ d=$(date +%Y-%m-%d)
 LOG=/data/misc/logging/amz
 command="$1"
 function -h {
-echo " -i  start the logging for init"
+echo " -i  prepare folders for taking bug report"
 echo " -tb take a bug report and send it to the sd card"
 echo " -h  Show Help Documentation"
-echo " -e  export the bugreport data to /sdcard to the zip file"
 echo " -p  take the hardware info and debug report"
 }
 
