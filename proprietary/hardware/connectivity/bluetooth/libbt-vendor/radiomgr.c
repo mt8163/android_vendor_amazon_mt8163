@@ -38,6 +38,7 @@
 
 #include <stdlib.h>
 #include <pthread.h>
+#include <signal.h>
 
 #include "bt_mtk.h"
 
@@ -54,10 +55,18 @@ extern BT_INIT_CB_T btinit_ctrl;
 ***************************************************************************/
 
 extern VOID *GORM_FW_Init_Thread(VOID *ptr);
-extern VOID notify_thread_exit(VOID);
+extern VOID *GORM_SCO_Init_Thread(VOID *ptr);
+extern VOID thread_exit(INT32 signo);
 
 
-BOOL BT_InitDevice(UINT32 chipId, PUCHAR pucNvRamData)
+BOOL BT_InitDevice(
+    UINT32  chipId,
+    PUCHAR  pucNvRamData,
+    UINT32  u4Baud,
+    UINT32  u4HostBaud,
+    UINT32  u4FlowControl,
+    SETUP_UART_PARAM_T setup_uart_param
+    )
 {
     LOG_DBG("BT_InitDevice\n");
 
@@ -67,10 +76,34 @@ BOOL BT_InitDevice(UINT32 chipId, PUCHAR pucNvRamData)
     btinit->chip_id = chipId;
     /* Copy configuration data */
     memcpy(btinit->bt_nvram.raw, pucNvRamData, sizeof(ap_nvram_btradio_struct));
+    /* Save init variables, which are used on standalone chip */
+    btinit->bt_baud = u4Baud;
+    btinit->host_baud = u4HostBaud;
+    btinit->flow_ctrl = u4FlowControl;
+    btinit->host_uart_cback = setup_uart_param;
+
+    if (SIG_ERR == signal(SIGRTMIN, thread_exit)) {
+        LOG_ERR("Register signal handler fails errno(%d)\n", errno);
+    }
 
     if (pthread_create(&btinit_ctrl.worker_thread, NULL, \
           GORM_FW_Init_Thread, NULL) != 0) {
         LOG_ERR("Create FW init thread fails\n");
+        return FALSE;
+    }
+    else {
+        btinit_ctrl.worker_thread_running = TRUE;
+        return TRUE;
+    }
+}
+
+BOOL BT_InitSCO(VOID)
+{
+    LOG_DBG("BT_InitSCO\n");
+
+    if (pthread_create(&btinit_ctrl.worker_thread, NULL, \
+          GORM_SCO_Init_Thread, NULL) != 0) {
+        LOG_ERR("Create SCO init thread fails\n");
         return FALSE;
     }
     else {
@@ -89,18 +122,14 @@ BOOL BT_DeinitDevice(VOID)
 VOID BT_Cleanup(VOID)
 {
     /* Cancel any remaining running thread */
-    if (btinit_ctrl.worker_thread_running)
-        notify_thread_exit();
-
-    /*
-     * Since Android M, pthread_exit only frees mapped space (including pthread_internal_t and thread stack)
-     * for detached thread; for joinable thread, it is left for the pthread_join caller to clean up.
-     *
-     * The thread type is specified when thread create, default joinable for new thread if not set attribute with
-     * PTHREAD_CREATE_DETATCHED, or not call pthread_detach before thread exit.
-     */
-    /* Always do pthread_join no matter the target thread has exited or not */
-    pthread_join(btinit_ctrl.worker_thread, NULL);
-
+    if (btinit_ctrl.worker_thread_running) {
+        pthread_kill(btinit_ctrl.worker_thread, SIGRTMIN);
+        /* Wait until thread exit */
+        pthread_join(btinit_ctrl.worker_thread, NULL);
+        btinit_ctrl.worker_thread_running = FALSE;
+    }
+    if (SIG_ERR == signal(SIGRTMIN, SIG_DFL)) {
+        LOG_ERR("Restore signal handler fails errno(%d)\n", errno);
+    }
     return;
 }

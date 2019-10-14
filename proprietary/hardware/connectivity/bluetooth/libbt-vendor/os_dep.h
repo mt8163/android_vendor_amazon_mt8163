@@ -69,8 +69,6 @@ typedef long long INT64;
 typedef void VOID;
 typedef void* PVOID;
 
-#define UNUSED_ATTR __attribute__((unused))
-#define WAIT_TIME_SECONDS     2
 
 /* LOG_TAG must be defined before log.h */
 #ifdef  LOG_TAG

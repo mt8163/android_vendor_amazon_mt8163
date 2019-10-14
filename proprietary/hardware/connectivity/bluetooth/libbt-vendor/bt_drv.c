@@ -41,12 +41,9 @@
 
 //===============        I N T E R F A C E S      =======================
 
-int mtk_bt_init(const bt_vendor_callbacks_t* p_cb, UNUSED_ATTR unsigned char *local_bdaddr)
+int mtk_bt_init(const bt_vendor_callbacks_t* p_cb, unsigned char *local_bdaddr)
 {
     LOG_TRC();
-
-    store_bdaddr(local_bdaddr);
-
     set_callbacks(p_cb);
     return 0;
 }
@@ -66,7 +63,7 @@ int mtk_bt_op(bt_vendor_opcode_t opcode, void *param)
         LOG_DBG("BT_VND_OP_USERIAL_OPEN\n");
 
         ((int*)param)[0] = init_uart();
-        ret = 1; /* CMD/EVT/ACL-In/ACL-Out via the same fd */
+        ret = 1; // CMD/EVT/ACL-In/ACL-Out via the same fd
         break;
 
       case BT_VND_OP_USERIAL_CLOSE:
@@ -79,8 +76,9 @@ int mtk_bt_op(bt_vendor_opcode_t opcode, void *param)
         ret = mtk_fw_cfg();
         break;
 
-      case BT_VND_OP_SCO_CFG: /* never called since Android O */
+      case BT_VND_OP_SCO_CFG:
         LOG_DBG("BT_VND_OP_SCO_CFG\n");
+        ret = mtk_sco_cfg();
         break;
 
       case BT_VND_OP_GET_LPM_IDLE_TIMEOUT:
@@ -101,10 +99,10 @@ int mtk_bt_op(bt_vendor_opcode_t opcode, void *param)
         ret = mtk_prepare_off();
         break;
 
-#if 0 /* MTK specific vendor opcode, deprecated since Android O */
+#if MTK_VENDOR_OPCODE == TRUE
       case BT_VND_OP_SET_FW_ASSERT:
-        LOG_DBG("BT_VND_OP_SET_FW_ASSERT 0x%08x\n", *((uint32_t*)param));
-        ret = mtk_set_fw_assert(*((uint32_t*)param));
+        LOG_DBG("BT_VND_OP_SET_FW_ASSERT, reason: %d\n", *((uint8_t*)param));
+        ret = mtk_set_fw_assert(*((uint8_t*)param));
         break;
 
       case BT_VND_OP_SET_PSM_CONTRL:
@@ -125,8 +123,8 @@ int mtk_bt_op(bt_vendor_opcode_t opcode, void *param)
 void mtk_bt_cleanup()
 {
     LOG_TRC();
-    clean_callbacks();
     clean_resource();
+    clean_callbacks();
     return;
 }
 

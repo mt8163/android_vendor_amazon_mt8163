@@ -43,7 +43,7 @@
 #include "CFG_BT_File.h"
 #include "os_dep.h"
 
-#define BD_ADDR_LEN             6   /* Device address length */
+
 #define HCI_CMD_MAX_SIZE        251
 
 /********************************************************************************
@@ -60,15 +60,7 @@ typedef enum {
   CMD_SUCCESS,
   CMD_FAIL,
   CMD_PENDING,
-  CMD_TERMINATE,
 } HCI_CMD_STATUS_T;
-
-typedef enum {
-  BT_UNKNOWN = 0,
-  BT_COMBO,
-  BT_CONSYS,
-  BT_CONNAC,
-} CHIP_TYPE_T;
 
 typedef union {
   ap_nvram_btradio_struct fields;
@@ -80,10 +72,21 @@ typedef struct {
   HCI_CMD_FUNC_T command_func;
 } HCI_SEQ_T;
 
+typedef INT32 (*SETUP_UART_PARAM_T)(UINT32 u4Baud, UINT32 u4FlowControl);
+
 typedef struct {
   UINT32 chip_id;
-  CHIP_TYPE_T chip_type;
   BT_NVRAM_DATA_T bt_nvram;
+  UINT32 bt_baud;
+  UINT32 host_baud;
+  UINT32 flow_ctrl;
+  SETUP_UART_PARAM_T host_uart_cback;
+  PUCHAR patch_ext_data;
+  UINT32 patch_ext_len;
+  UINT32 patch_ext_offset;
+  PUCHAR patch_data;
+  UINT32 patch_len;
+  UINT32 patch_offset;
   HCI_SEQ_T *cur_script;
 } BT_INIT_VAR_T;
 
@@ -93,7 +96,6 @@ typedef struct {
   pthread_mutex_t mutex;
   pthread_mutexattr_t attr;
   pthread_cond_t cond;
-  pthread_condattr_t condattr;
   BOOL worker_thread_running;
 } BT_INIT_CB_T;
 
@@ -101,14 +103,14 @@ typedef struct {
 /********************************************************************************
 ** Function Declaration
 */
-void store_bdaddr(const unsigned char *addr);
 void set_callbacks(const bt_vendor_callbacks_t* p_cb);
 void clean_callbacks(void);
 int init_uart(void);
 void close_uart(void);
 int mtk_fw_cfg(void);
+int mtk_sco_cfg(void);
 int mtk_prepare_off(void);
-int mtk_set_fw_assert(uint32_t reason);
+int mtk_set_fw_assert(uint8_t reason);
 int mtk_set_psm_control(bool enable);
 void clean_resource(void);
 

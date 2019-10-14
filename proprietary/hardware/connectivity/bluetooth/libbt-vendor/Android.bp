@@ -11,7 +11,7 @@ cc_library_shared {
     ],
     include_dirs: ["system/bt/hci/include"],
     local_include_dirs: ["src"],
-    cflags: ["-DBD_ADDR_AUTOGEN",],
+    cflags: ["-DBD_ADDR_AUTOGEN", "-DMTK_CONSYS_MT8163",],
     proprietary: true,
     owner: "mtk",
     shared_libs: [
