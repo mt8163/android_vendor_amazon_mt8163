@@ -12,6 +12,9 @@ device=mt8163-generic
 d=$(date +%Y-%m-%d)
 LOG=/data/misc/logging/amz
 command="$1"
+# increase verbosity in dmesg
+echo 8 > /proc/sys/kernel/printk
+
 function -h {
 echo " -i  prepare folders for taking bug report"
 echo " -tb take a bug report and send it to the sd card"
