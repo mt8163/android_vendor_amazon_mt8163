@@ -112,9 +112,9 @@ int init_uart(void)
 {
     LOG_TRC();
 
-    bt_fd = open(CUST_BT_SERIAL_PORT, O_RDWR | O_NOCTTY | O_NONBLOCK);
+    bt_fd = open("/dev/stpbt", O_RDWR | O_NOCTTY | O_NONBLOCK);
     if (bt_fd < 0) {
-        LOG_ERR("Can't open serial port\n");
+        LOG_ERR("Can't open /dev/stpbt\n");
         return -1;
     }
 
