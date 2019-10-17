@@ -15,6 +15,11 @@ command="$1"
 # increase verbosity in dmesg
 echo 8 > /proc/sys/kernel/printk
 
+function cleanup {
+rm -rf /data/misc/logging/amz
+rm -rf /sdcard/tmp/
+}
+
 function -h {
 echo " -i  prepare folders for taking bug report"
 echo " -tb take a bug report and send it to the sd card"
@@ -45,11 +50,6 @@ cp -r $LOG /sdcard/tmp/
 tar -zcf bugreport-$device-$d.tar.gz /sdcard//tmp
 mv /sdcard/tmp/bugreport-$device-$d.tar.gz /sdcard/
 cleanup
-}
-
-function cleanup {
-rm -rf /data/misc/logging/amz
-rm -rf /sdcard/tmp/
 }
 
 $command
