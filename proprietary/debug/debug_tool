@@ -9,7 +9,7 @@
 # received a copy of the GNU General Public License along with this program. If not, see http://www.gnu.org/licenses/.
 log_dir=/data/misc/logging/
 device=mt8163-generic
-d=$(date +%Y-%m-%d)
+d=date +%Y-%m-%d
 LOG=/data/misc/logging/amz
 command="$1"
 # increase printk verbosity in dmesg
