@@ -29,4 +29,7 @@ PRODUCT_COPY_FILES += \
    $(LOCAL_PATH_VENDOR)/proprietary/insmod/init.insmod.sh:$(TARGET_COPY_OUT_VENDOR)/bin/init.insmod.sh \
    $(LOCAL_PATH_VENDOR)/proprietary/insmod/init.insmod.cfg:$(TARGET_COPY_OUT_VENDOR)/etc/init.insmod.cfg 
 
+PRODUCT_PROPERTY_OVERRIDES  += \
+   ro.config.hw_quickpoweron=true \
+   ro.build.shutdown_timeout=0
 
