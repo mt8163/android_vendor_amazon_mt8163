@@ -44,6 +44,7 @@ function -tb {
 mkdir -p /sdcard/tmp
 #bugreport > /sdcard/tmp/bugreport-$device-$d.log disabled because this is causing issues with the device
 timeout 10 logcat > /sdcard/tmp/logcat.log
+timeout 10 dmesg -w > /sdcard/tmp/dmesg.log
 getprop > /sdcard/tmp/properties.prop
 -p
 cp -r $LOG /sdcard/tmp/
