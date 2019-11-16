@@ -24,3 +24,9 @@ PRODUCT_PARCKAGES += \
 PRODUCT_COPY_FILES += \
 	$(LOCAL_PATH_VENDOR)/proprietary/debug/debug_tool:$(TARGET_COPY_OUT_VENDOR)/bin/debug_tool
 
+# Kernel modules loader
+PRODUCT_COPY_FILES += \
+   $(LOCAL_PATH_VENDOR)/proprietary/insmod/init.insmod.sh:$(TARGET_COPY_OUT_VENDOR)/bin/init.insmod.sh \
+   $(LOCAL_PATH_VENDOR)/proprietary/insmod/init.insmod.cfg:$(TARGET_COPY_OUT_VENDOR)/etc/init.insmod.cfg 
+
+
