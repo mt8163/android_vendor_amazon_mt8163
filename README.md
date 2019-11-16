@@ -40,11 +40,8 @@ git clone https://github.com/mt8163/android_vendor_amazon_karnak vendor/amazon/k
 ```
 
 #### 4. Build!
-
-Install my build script to build the kernel locally
 ```bash
 curl  https://raw.githubusercontent.com/488315/build_scripts/master/build.sh > build.sh
-curl  https://raw.githubusercontent.com/488315/build_scripts/master/build_kernel.sh > build_kernel.sh
 ```
 
 
