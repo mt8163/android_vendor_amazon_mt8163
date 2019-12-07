@@ -29,9 +29,12 @@ namespace bluetooth {
 namespace hci {
 
 size_t H4Protocol::Send(uint8_t type, const uint8_t* data, size_t length) {
-  struct iovec iov[] = {{&type, sizeof(type)},
-                        {const_cast<uint8_t*>(data), length}};
-  return WritevSafely(uart_fd_, iov, sizeof(iov) / sizeof(iov[0]));
+  std::unique_ptr<uint8_t[]> adapted_data(new uint8_t[length+1]);
+  uint8_t* p_data = adapted_data.get();
+  *(p_data) = type;
+  memcpy(++p_data, data, length);
+  int rv = WriteSafely(uart_fd_, --p_data, length+1);
+  return rv;
 }
 
 void H4Protocol::OnPacketReady() {
