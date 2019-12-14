@@ -15,9 +15,19 @@
 cc_library_shared {
 
     name: "power.mt8163",
-    relative_install_path: "hw",
-    proprietary: true,
+
     srcs: ["power.c"],
-    shared_libs: ["liblog"],
+
+    relative_install_path: "hw",
+
+    shared_libs: [
+        "liblog",
+        "libutils",
+    ],
+    header_libs: ["libhardware_headers"],
+
+    proprietary: true,
+    owner: "mtk",
 
 }
+
