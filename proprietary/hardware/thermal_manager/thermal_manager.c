@@ -75,14 +75,13 @@
 
 #if MTK_LOG_ENABLE
 #define TM_LOG(_priority_, _fmt_, args...)  LOG_PRI(_priority_, TM_LOG_TAG, _fmt_, ##args)
-static int _tm_debug_on = 1;
+
 #else
 #define TM_LOG(_priority_, _fmt_, args...)
 #endif
 
 int (*loadmtc)(char *) = NULL;
-#define LIB_FULL_NAME "libmtcloader.so"
-
+#define LIB_FULL_NAME "/vendor/lib/libmtcloader.so"
 typedef int (*load)(char *);
 
 int (*loadchange_policy)(char *, int) = NULL;
@@ -118,24 +117,24 @@ int main(int argc, char **argv)
         int ret = 0;
 
         if (argc == 2) {
-			TM_LOG(ANDROID_LOG_INFO, "loadmtc %s\n", argv[1]);
-        	ret = loadmtc(argv[1]);
+            TM_LOG(ANDROID_LOG_INFO, "loadmtc %s\n", argv[1]);
+            ret = loadmtc(argv[1]);
         } else if (argc == 3) {
-			func2 = dlsym(handle, "change_policy");
-			loadchange_policy = (load_change_policy)func2;
+  	    func2 = dlsym(handle, "change_policy");
+  	    loadchange_policy = (load_change_policy)func2;
 
-			if (loadchange_policy == NULL) {
-		        TM_LOG(ANDROID_LOG_ERROR, "change_policy err: %s.\n", dlerror());
-				dlclose(handle);
-				return -1;
-			}
-			ret = loadchange_policy(argv[1], atoi(argv[2]));
+    	    if (loadchange_policy == NULL) {
+                TM_LOG(ANDROID_LOG_ERROR, "change_policy err: %s.\n", dlerror());
+    		dlclose(handle);
+    		return -1;
+    	    }
+    	    ret = loadchange_policy(argv[1], atoi(argv[2]));
             TM_LOG(ANDROID_LOG_INFO, "change_policy ret: %d.\n", ret);
-		}
-		dlclose(handle);
+ 	}
+	dlclose(handle);
         return ret;
     } else {
-	    TM_LOG(ANDROID_LOG_INFO, "loadmtc thermal.conf\n");
+        TM_LOG(ANDROID_LOG_INFO, "loadmtc thermal.conf\n");
         int ret = loadmtc("/vendor/etc/.tp/thermal.conf"); /* default policy */
         dlclose(handle);
         return ret;
