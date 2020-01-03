@@ -1,5 +1,0 @@
-service sensors-hal-1-0 /vendor/bin/hw/android.hardware.sensors@1.0-service.mtk
-    class hal
-    user system
-    group system wakelock input
-    capabilities BLOCK_SUSPEND SYS_NICE

@@ -20,14 +20,14 @@ LOCAL_PATH_VENDOR := vendor/amazon/mt8163
 PRODUCT_PARCKAGES += \
    thermal_manager
 
-# Debug Tool
-PRODUCT_COPY_FILES += \
-   $(LOCAL_PATH_VENDOR)/proprietary/debug/debug_tool:$(TARGET_COPY_OUT_VENDOR)/bin/debug_tool
+# Debugging tool
+PRODUCT_PACKAGES +=\
+   debug_tool
 
 # Kernel modules loader
 PRODUCT_COPY_FILES += \
-   $(LOCAL_PATH_VENDOR)/proprietary/insmod/init.insmod.sh:$(TARGET_COPY_OUT_VENDOR)/bin/init.insmod.sh \
-   $(LOCAL_PATH_VENDOR)/proprietary/insmod/init.insmod.cfg:$(TARGET_COPY_OUT_VENDOR)/etc/init.insmod.cfg 
+   $(LOCAL_PATH_VENDOR)/proprietary/external/insmod/init.insmod.sh:$(TARGET_COPY_OUT_VENDOR)/bin/init.insmod.sh \
+   $(LOCAL_PATH_VENDOR)/proprietary/external/insmod/init.insmod.cfg:$(TARGET_COPY_OUT_VENDOR)/etc/init.insmod.cfg 
 
 PRODUCT_PROPERTY_OVERRIDES  += \
    ro.config.hw_quickpoweron=true \
