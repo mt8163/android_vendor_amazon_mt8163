@@ -1,4 +1,0 @@
-start debug_tool
-
-service debug_tool /vendor/bin/debug_tool
-
