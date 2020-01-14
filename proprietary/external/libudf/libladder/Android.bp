@@ -1,0 +1,22 @@
+cc_library {
+    srcs: ["libladder.cpp"],
+    name: "libladder",
+    proprietary: true,
+    owner: "mtk",
+    include_dirs: [
+        "system/core/libunwindstack",
+        "system/core/base/include",
+        ],
+    shared_libs: [
+        "libunwindstack",
+        "liblog",
+        "libbase",
+     ],
+    whole_static_libs: ["libdemangle"],
+    allow_undefined_symbols: true,
+     cflags: [
+	"-Wexit-time-destructors",
+	"-DNO_LIBDEXFILE_SUPPORT",
+    ],
+
+}

@@ -1,0 +1,94 @@
+///
+bootstrap_go_package {
+    name: "soong-libgralloc_extra_common-mediatek",
+    pkgPath: "android/soong/libgralloc_extra_common/mediatek",
+    deps: [
+        "soong-android",
+        "soong-cc",
+    ],
+    srcs: [
+        "libgralloc_extra_common.go",
+    ],
+    pluginFor: ["soong_build"],
+}
+
+mtk_libgralloc_extra_common_defaults {
+    name: "mtk_libgralloc_extra_common_defaults",
+}
+
+//##############################################################################
+// Build Gralloc Extra System library
+// #
+//
+cc_library_shared {
+
+    name: "libgralloc_extra_sys",
+
+    srcs: [
+        "ge_operator.cpp",
+        "ge_misc.c",
+        "platform/ge_platform_default.c",
+    ],
+
+    include_dirs: [
+        "system/core/libion/include",
+	"vendor/amazon/karnak/include",
+	"device/mediatek/common/kernel-headers",
+    ],
+
+    export_include_dirs: ["include"],
+
+    shared_libs: [
+        "libhardware",
+        "libcutils",
+        "libutils",
+        "liblog",
+        "libion",
+        "libged_sys",
+    ],
+    owner: "mtk",
+    defaults: [
+        "mtk_libgralloc_extra_common_defaults",
+    ],
+}
+
+//##############################################################################
+// Build Gralloc Extra Vendor library
+// #
+//
+cc_library_shared {
+
+    name: "libgralloc_extra",
+
+    srcs: [
+        "ge_operator.cpp",
+        "ge_misc.c",
+        "platform/ge_platform_default.c",
+    ],
+
+    include_dirs: [
+        "system/core/libion/include",
+	"vendor/amazon/karnak/include",
+	"device/mediatek/common/kernel-headers",
+    ],
+
+    export_include_dirs: ["include"],
+
+    shared_libs: [
+        "libhardware",
+        "libcutils",
+        "libutils",
+        "liblog",
+        "libion",
+        "libged",
+    ],
+
+    proprietary: true,
+
+    owner: "mtk",
+
+    defaults: [
+        "mtk_libgralloc_extra_common_defaults",
+    ],
+}
+

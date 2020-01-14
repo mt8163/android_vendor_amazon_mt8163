@@ -1,0 +1,25 @@
+//libged_sys
+cc_prebuilt_library_shared {
+    name: "libged_sys",
+
+	shared_libs: [
+        "libbinder",
+        "libcutils",
+        "libutils",
+        "liblog",
+        "libdl",
+        "libsync",
+        "libnativewindow",
+        "libhidlbase",
+        "libhidltransport",
+        "android.hardware.power@1.0",
+    ],
+    target: {
+             android_arm: {
+                    srcs: ["arm/libged_sys.so"],
+             },
+            },
+           strip: {
+                   none:true,
+             },
+    }

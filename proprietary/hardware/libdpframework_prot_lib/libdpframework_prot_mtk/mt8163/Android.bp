@@ -1,0 +1,22 @@
+cc_prebuilt_library_static {
+    arch: {
+        arm: {
+            srcs: [
+                "arm/libdpframework_prot_mtk.a",
+            ],
+        },
+        arm64: {
+            srcs: [
+                "arm64/libdpframework_prot_mtk.a",
+            ],
+        },
+    },
+    compile_multilib: "both",
+    export_include_dirs: [
+        "include/mt8163",
+        "include/common",
+    ],
+    name: "libdpframework_prot_mtk",
+    owner: "mtk",
+}
+

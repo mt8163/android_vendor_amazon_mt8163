@@ -1,0 +1,19 @@
+//mtk soong
+bootstrap_go_package {
+    name: "soong-android-mediatek",
+    pkgPath: "android/soong/android/mediatek",
+    deps: [
+        "blueprint-bootstrap",
+        "blueprint-proptools",
+    ],
+    srcs: [
+        "android/config.go",
+    ],
+    pluginFor: ["soong_build"],
+}
+
+// FIXME
+kernel_headers {
+    name: "device_kernel_headers_sys",
+    vendor: false,
+}

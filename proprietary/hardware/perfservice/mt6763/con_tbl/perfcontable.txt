@@ -1,0 +1,24 @@
+#CAUTION:
+#CMD NAME AND CMD ID IS 1-1 MAPPING, PLEASE CHECK IF IT WILL RUIN THE CMDS IN perfservice_types.h
+#
+#cmd name,                cmd ID, entry,             compare, max value, min value, normal value, sport value
+CMD_SET_CPUFREQ_HISPEED_FREQ, 12, /sys/devices/system/cpu/cpufreq/interactive/hispeed_freq, more, 2340000, 0, 1066000, 2340000
+CMD_SET_CPUFREQ_MIN_SAMPLE_TIME, 13, /sys/devices/system/cpu/cpufreq/interactive/min_sample_time, more, 800000, 0
+CMD_SET_CPUFREQ_ABOVE_HISPEED_DELAY, 14, /sys/devices/system/cpu/cpufreq/interactive/above_hispeed_delay, less, 200000, 0
+CMD_SET_ROOT_CLUSTER, 19, /proc/ppm/root_cluster, more, 1, -1, -1, 1
+CMD_SET_CPU_UP_THRESHOLD, 20, /proc/hps/up_threshold, less, 100, 0, 95, 80
+CMD_SET_CPU_DOWN_THRESHOLD, 21, /proc/hps/down_threshold, less, 100, 0, 85, 60
+CMD_SET_RUSH_BOOST_ENABLED, 25, /proc/hps/rush_boost_enabled, more, 1, 0, 1, 1
+CMD_SET_HEAVY_TASK_ENABLED, 26, /proc/hps/heavy_task_enabled, more, 1, 0, 0, 1
+CMD_SET_DVFS_POWER_MODE, 32, /proc/cpufreq/cpufreq_power_mode, more, 3, 0, 0, 3
+CMD_SET_DCM_MODE, 33, /sys/power/dcm_state, more, 1, 0, 0, 1
+CMD_SET_PPM_HICA_VAR, 35, /proc/ppm/policy/hica_variant, less, 1, 0, 1, 0
+CMD_SET_HPS_UP_TIMES, 36, /proc/hps/up_times, less, 100, 1, 3, 1
+CMD_SET_HPS_DOWN_TIMES, 37, /proc/hps/down_times, less, 100, 1, 1, 5
+CMD_SET_PPM_L_TO_4L_LL_HOLD_TIME, 38, /proc/ppm/policy/hica_settings/L_ONLY_to_4L_LL/loading_hold_time, less, 100, 1, 4, 1
+CMD_SET_SCHED_HTASK_THRESH, 39, /sys/devices/system/cpu/rq-stats/htasks_thresh, less, 1023, 0, 1000, 800
+CMD_SET_SCHED_AVG_HTASK_THRESH, 41, /sys/devices/system/cpu/rq-stats/avg_htasks_thresh, less, 1023, 0, 1000, 800
+CMD_SET_VCORE_BW_THRES, 45, /proc/fliperfs/cg_threshold, less, 12800, 400, 6400, 500
+CMD_SET_VCORE_BW_ENABLED, 46, /proc/fliperfs/cg_enable, more, 1, 0, 1, 1
+CMD_SET_VCORE_MIN, 47, /proc/fliperfs/perf, less, 3, 0, -1, -1
+CMD_SET_VCORE_BW_THRES_DDR3, 48, /proc/fliperfs/cg_threshold_ddr3, less, 12800, 400, 2000, 500
