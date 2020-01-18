@@ -9,7 +9,7 @@
 char device[20];
 
 int show_help(void){
-            printf("\n  USAGE:\n");
+            printf("    USAGE:\n");
             printf("    -h Prints this help message.\n");
             printf("    -c Clean up the LOG directory.\n");
             printf("    -l Take logcat.\n");
@@ -38,15 +38,23 @@ int main(int argc, char *argv[])
 
         printf("\n            DEBUG TOOL for %s\n", device);
 
+        /* Check if argc length is 2 */
         if (argc < 2){
-           printf("[-] Expected more arguments.\n");
+           printf("[-] Expected more arguments.\n\n");
+           show_help();
+           return 1;
+        }
+
+        /* Check if user entered more than 1 argument */
+        if (argc > 2){
+           printf("[-] Only 1 argument is required.\n\n");
            show_help();
            return 1;
         }
 
         if (access(LOG_DIRECTORY, F_OK ) != -1 && (*argv[2] != '-c')) {}
         else {
-            printf("[?] Logging directory is not present, regenerating...\n");
+            printf("[?] Logging directory is not present, regenerating...\n\n");
             system("mkdir -p /data/local/tmp/logging");
         }
 
@@ -72,7 +80,7 @@ int main(int argc, char *argv[])
         if(strcmp(argv[1],"-d")==0)
         {
            /* Check for root */
-           if(system("su")==0
+           if(system("su")==0)
            {
                printf("[?] Taking dmesg...\n");
                system("su -c dmesg > " LOG_DIRECTORY "dmesg.log");
@@ -97,13 +105,6 @@ int main(int argc, char *argv[])
            printf("[?] Taking bugreport...\n");
            system("timeout 15 bugreport > " LOG_DIRECTORY "bugreport.log");
            printf("[+] All OK!\n");
-        }
-
-        else
-        {
-           printf("[?] Invalid option: %s\n", argv[1]);
-           show_help();
-           exit(1);
         }
         return 0;
 }
