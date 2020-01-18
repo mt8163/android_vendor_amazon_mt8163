@@ -46,55 +46,64 @@ int main(int argc, char *argv[])
 
         if (access(LOG_DIRECTORY, F_OK ) != -1 && (*argv[2] != '-c')) {}
         else {
-        printf("[?] Logging directory is not present, regenerating...\n");
-        system("mkdir -p /data/local/tmp/logging");
-}
-
-    static const struct option longopts[] = {
-        {.name = "Help Message", .has_arg = no_argument, .val = 'h'},
-        {.name = "Cleans up logging directories", .has_arg = no_argument, .val = 'c'},
-        {.name = "Takes logcat", .has_arg = no_argument, .val = 'l'},
-        {.name = "Takes dmesg", .has_arg = no_argument, .val = 'd'},
-        {.name = "Takes bugreport", .has_arg = no_argument, .val = 'b'},
-        {.name = "Get device properties", .has_arg = no_argument, .val = 'g'},
-        {},
-    };
-    for (;;) {
-        int opt = getopt_long(argc, argv, "hcldbg", longopts, NULL);
-        if (opt == -1) // If not enough arguments exit the program.
-            break;
-        switch (opt) {
-        case 'h':
-            show_help();
-            break;
-        case 'c':
-            printf("[?] Cleaning up...\n");
-            system("rm -rf " LOG_DIRECTORY);
-            printf("[+] All OK!\n");
-            break;
-        case 'l':
-            printf("[?] Taking logcat...\n");
-            system("timeout 10 logcat > " LOG_DIRECTORY "logcat.log");
-            printf("[+] All OK!\n");
-            break;
-        case 'd':
-            printf("[?] Taking dmesg...\n");
-            system("timeout 10 dmesg -w > " LOG_DIRECTORY "dmesg.log");
-            printf("[+] All OK!\n");
-            break;
-        case 'b':
-            printf("[?] Taking bugreport...\n");
-            system("timeout 15 bugreport > " LOG_DIRECTORY "bugreport.log");
-            printf("[+] All OK!\n");
-            break;
-        case 'g':
-            printf("[?] Getting device props...\n");
-            system("getprop > " LOG_DIRECTORY "properties.prop");
-            printf("[+] All OK!\n");
-        default:
-            // Return 1 if unexpected option
-            return 1;
+            printf("[?] Logging directory is not present, regenerating...\n");
+            system("mkdir -p /data/local/tmp/logging");
         }
-    }
-    return 0;
+
+        if(strcmp(argv[1],"-h")==0)
+        {
+           show_help();
+        }
+
+        if(strcmp(argv[1],"-c")==0)
+        {
+           printf("[?] Cleaning up...\n");
+           system("rm -rf " LOG_DIRECTORY);
+           printf("[+] All OK!\n");
+        }
+
+        if(strcmp(argv[1],"-l")==0)
+        {
+           printf("[?] Taking logcat\n");
+           system("timeout 10 logcat > " LOG_DIRECTORY "logcat.log");
+           printf("[+] All OK\n");
+        }
+
+        if(strcmp(argv[1],"-d")==0)
+        {
+           /* Check for root */
+           if(system("su")==0
+           {
+               printf("[?] Taking dmesg...\n");
+               system("su -c dmesg > " LOG_DIRECTORY "dmesg.log");
+               printf("[+] All OK!\n");
+           }
+           else
+           {
+              printf("[-] Failed to open su\n");
+              exit(1);
+           }
+        }
+
+        if(strcmp(argv[1],"-g")==0)
+        {
+           printf("[?] Getting device properties...\n");
+           system("getprop > " LOG_DIRECTORY "properties.prop");
+           printf("[+] All OK\n");
+        }
+
+        if(strcmp(argv[1],"-b")==0)
+        {
+           printf("[?] Taking bugreport...\n");
+           system("timeout 15 bugreport > " LOG_DIRECTORY "bugreport.log");
+           printf("[+] All OK!\n");
+        }
+
+        else
+        {
+           printf("[?] Invalid option: %s\n", argv[1]);
+           show_help();
+           exit(1);
+        }
+        return 0;
 }
