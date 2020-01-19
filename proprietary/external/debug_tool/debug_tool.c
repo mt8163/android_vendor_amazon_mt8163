@@ -1,12 +1,12 @@
 #include <stdlib.h>
-#include <getopt.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <cutils/properties.h>
 
 #define LOG_DIRECTORY "/data/local/tmp/logging/"
 
 /* Define used variables */
-char device[20];
+char device[PROP_VALUE_MAX+1];
 
 int show_help(void){
             printf("    USAGE:\n");
@@ -21,20 +21,7 @@ int show_help(void){
 
 int main(int argc, char *argv[])
 {
-        FILE *fp = popen("getprop ro.product.device", "r");
-        if (!fp) {
-           printf("[-] Failed to open pipe.\n");
-           exit(1);
-        }
-
-        if (fgets(device, sizeof(device), fp) != 0) {}
-
-        int status = pclose(fp);
-        if (status == -1)
-        {
-	     printf("[-] Failed to close pipe. \n");
-	     return 1;
-        }
+        __system_property_get("ro.product.device", device);        
 
         printf("\n            DEBUG TOOL for %s\n", device);
 
