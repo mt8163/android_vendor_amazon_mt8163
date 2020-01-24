@@ -27,6 +27,6 @@ int main() {
      * One thread blocks on a "poll"
      * The second thread is needed for all other HAL methods.
      */
-    ALOGE("sensor hidl defaultPassthroughServiceImplementation start.");
+    ALOGD("sensor hidl defaultPassthroughServiceImplementation start.");
     return defaultPassthroughServiceImplementation<ISensors>(2);
 }
