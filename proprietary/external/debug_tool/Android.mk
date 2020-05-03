@@ -7,7 +7,7 @@ LOCAL_SRC_FILES:=   \
 
 LOCAL_MODULE_TAGS := optional
 
-LOCAL_CFLAGS := -Wno-missing-field-initializers -Wno-type-limits
+LOCAL_CFLAGS := -Wno-missing-field-initializers -Wno-type-limits -Wno-implicit-function-declaration
 
 LOCAL_PROPRIETARY_MODULE := true
 
