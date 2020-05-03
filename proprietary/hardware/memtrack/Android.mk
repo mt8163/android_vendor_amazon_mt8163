@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+ifeq ($(TARGET_BUILD_MTK_MEMTRACK),true)
+
 LOCAL_PATH := $(call my-dir)
 
 # HAL module implemenation stored in
@@ -36,4 +38,4 @@ LOCAL_MODULE_OWNER := mtk
 
 LOCAL_MULTILIB := both
 include $(BUILD_SHARED_LIBRARY)
-
+endif
