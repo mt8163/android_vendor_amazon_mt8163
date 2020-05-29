@@ -16,7 +16,7 @@ source ~/.profile
 
 Further reading: https://source.android.com/setup/build/downloading
 
-#### 2. Download the Lineage OS 16.0 source code
+#### 2. Download the Lineage OS 17.1 source code
 
 You may have to restart your shell after Step 1 to refresh the PATH variable.
 
@@ -27,16 +27,9 @@ You may have to restart your shell after Step 1 to refresh the PATH variable.
 mkdir -p ~/android/lineage
 cd <folder to contain source>
 # Initialise repo tool
-repo init -u git://github.com/LineageOS/android.git -b lineage-16.0
+repo init -u git://github.com/mt8163/android.git -b lineage-17.1
+git clone https://github.com/mt8163/local_manifests -b lineage-17.1 .repo/local_manifests
 repo sync
-```
-
-#### 3. Clone Fire device repositories
-
-```bash
-git clone https://github.com/mt8163/android_device_amazon_karnak device/amazon/karnak
-git clone https://github.com/mt8163/android_kernel_amazon_karnak kernel/amazon/karnak
-git clone https://github.com/mt8163/android_vendor_amazon_karnak vendor/amazon/karnak
 ```
 
 #### 4. Build!
@@ -51,7 +44,7 @@ Learn how to do this here: https://wiki.lineageos.org/devices/bacon/build#build-
 
 ```bash
 # Ubuntu 16.04 and newer
-apt-get install bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg gperf imagemagick lib32ncurses5-dev lib32readline-dev lib32z1-dev liblz4-tool libncurses5-dev libsdl1.2-dev libssl-dev libwxgtk3.0-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev
+apt-get install bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg gperf imagemagick lib32ncurses5-dev lib32readline-dev lib32z1-dev liblz4-tool libncurses5 libncurses5-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev
 
 # Older than Ubuntu 16.04
 apt-get install bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg gperf imagemagick lib32ncurses5-dev lib32readline-dev lib32z1-dev liblz4-tool libncurses5-dev libsdl1.2-dev libssl-dev libwxgtk2.8-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev
