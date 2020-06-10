@@ -17,7 +17,7 @@
 LOCAL_PATH_VENDOR := vendor/amazon/mt8163
 
 # Thermal Manager
-PRODUCT_PARCKAGES += \
+PRODUCT_PACKAGES += \
    thermal_manager
 
 # Email
