@@ -31,6 +31,10 @@ PRODUCT_PACKAGES +=\
 # vold fix 
 PRODUCT_PACKAGES += \
    vold_fix
+   
+# MediatekParts
+PRODUCT_PACKAGES += \
+   MediatekParts
 
 # Kernel modules loader
 PRODUCT_COPY_FILES += \
