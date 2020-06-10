@@ -27,6 +27,10 @@ PRODUCT_PACKAGES += \
 # Debugging tool
 PRODUCT_PACKAGES +=\
    debug_tool
+   
+# vold fix 
+PRODUCT_PACKAGES += \
+   vold_fix
 
 # Kernel modules loader
 PRODUCT_COPY_FILES += \
