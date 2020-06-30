@@ -16,3 +16,10 @@
 
 TARGET_BOOTLOADER_BOARD_NAME := mt8163
 
+# MTK Platform Paths
+MTK_PATH_COMMON := vendor/amazon/mt8163/proprietary/custom/common
+MTK_PATH_CUSTOM_PLATFORM := vendor/amazon/mt8163/proprietary/custom/$(MTK_PLATFORM_DIR)
+MTK_PATH_CUSTOM := vendor/amazon/mt8163/proprietary/custom/$(MTK_PROJECT)
+MTK_PATH_SOURCE := vendor/amazon/mt8163/proprietary
+MTK_ROOT := vendor/amazon/mt8163/proprietary
+
