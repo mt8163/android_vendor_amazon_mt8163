@@ -103,7 +103,7 @@ Sensors::Sensors()
 
     // Require all the old HAL APIs to be present except for injection, which
     // is considered optional.
-    CHECK_GE(getHalDeviceVersion(), SENSORS_DEVICE_API_VERSION_1_0);
+    CHECK_GE(getHalDeviceVersion(), SENSORS_DEVICE_API_VERSION_1_3);
 
     if (getHalDeviceVersion() == SENSORS_DEVICE_API_VERSION_1_4) {
         if (mSensorDevice->inject_sensor_data == nullptr) {
