@@ -23,7 +23,7 @@
 #include <hidl/MQDescriptor.h>
 #include <map>
 
-#include <cutils/log.h>
+#include <log/log.h>
 
 namespace android {
 namespace hardware {

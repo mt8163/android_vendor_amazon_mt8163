@@ -9,11 +9,8 @@ cc_library_shared {
         "liblog",
         "libcutils",
         "libhardware",
-        "libhwbinder",
         "libbase",
         "libutils",
-        "libhidlbase",
-        "libhidltransport",
         "android.hardware.sensors@1.0",
     ],
 
@@ -40,9 +37,6 @@ cc_binary {
         "libhardware_legacy",
         "libhardware",
     ] + [
-        "libhwbinder",
-        "libhidlbase",
-        "libhidltransport",
         "android.hardware.sensors@1.0",
     ],
 

@@ -27,8 +27,6 @@ cc_library_shared {
         "libbase",
         "libcutils",
         "libhardware",
-        "libhidlbase",
-        "libhidltransport",
         "liblog",
         "libutils",
     ],
@@ -67,8 +65,6 @@ cc_binary {
         "libutils",
         "libhardware",
     ] + [
-        "libhidlbase",
-        "libhidltransport",
         "android.hardware.bluetooth@1.0",
     ],
 }
