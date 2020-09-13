@@ -33,6 +33,11 @@ cc_binary {
         "-Wno-multichar",
     ],
 
+    header_libs: [
+        "libhardware_headers",
+        "libutils_headers",
+    ],
+
     proprietary: true,
 
 }
