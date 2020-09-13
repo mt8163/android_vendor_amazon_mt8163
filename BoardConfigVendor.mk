@@ -14,6 +14,8 @@
 # limitations under the License.
 #
 
+TARGET_SPECIFIC_HEADER_PATH += vendor/amazon/mt8163/proprietary/hardware/include
+
 TARGET_BOOTLOADER_BOARD_NAME := mt8163
 
 # MTK Platform Paths
