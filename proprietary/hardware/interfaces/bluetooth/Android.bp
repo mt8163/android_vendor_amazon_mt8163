@@ -13,12 +13,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+subdirs = [
+    "mediatek",
+]
+
+bootstrap_go_package {
+    name: "soong-bthal-mediatek",
+    pkgPath: "android/soong/bthal/mediatek",
+    deps: [
+        "soong-android",
+        "soong-cc",
+    ],
+    srcs: [
+        "bt_hal.go",
+    ],
+    pluginFor: ["soong_build"],
+}
+
+mtk_bt_hal_defaults {
+    name: "mtk_bt_hal_defaults",
+    defaults: ["hidl_defaults"],
+    product_variables: {
+        debuggable: { // eng/userdebug build
+            cflags: [
+                "-DMTK_BT_HAL_DEBUG=TRUE",
+            ],
+        },
+    },
+}
+
 cc_library_shared {
     name: "android.hardware.bluetooth@1.0-impl-mediatek",
-    defaults: ["hidl_defaults"],
+    defaults: ["mtk_bt_hal_defaults"],
     vendor: true,
     relative_install_path: "hw",
     srcs: [
+        "bluetooth_address.cc",
         "bluetooth_hci.cc",
         "vendor_interface.cc",
     ],
@@ -27,13 +57,41 @@ cc_library_shared {
         "libbase",
         "libcutils",
         "libhardware",
+        "libhidlbase",
         "liblog",
         "libutils",
     ],
     static_libs: [
         "android.hardware.bluetooth-async-mediatek",
         "android.hardware.bluetooth-hci-mediatek",
+        "vendor.mediatek.hardware.bluetooth-hci",
     ],
+}
+
+cc_binary {
+    name: "android.hardware.bluetooth@1.0-service-mediatek",
+    relative_install_path: "hw",
+    proprietary: true,
+    owner: "mtk",
+
+    init_rc: [
+        "android.hardware.bluetooth@1.0-service-mediatek.rc",
+    ],
+    srcs: [
+        "service.cpp",
+    ],
+    shared_libs: [
+        "liblog",
+        "libcutils",
+        "libdl",
+        "libbase",
+        "libutils",
+        "libhardware",
+    ] + [
+        "libhidlbase",
+        "android.hardware.bluetooth@1.0",
+    ],
+
 }
 
 cc_library_static {
@@ -49,31 +107,10 @@ cc_library_static {
     ],
 }
 
-cc_binary {
-    name: "android.hardware.bluetooth@1.0-service-mediatek",
-    relative_install_path: "hw",
-    proprietary: true,
-    owner: "mtk",
-    init_rc: ["android.hardware.bluetooth@1.0-service-mediatek.rc"],
-    srcs: ["service.cpp"],
-
-    shared_libs: [
-        "liblog",
-        "libcutils",
-        "libdl",
-        "libbase",
-        "libutils",
-        "libhardware",
-    ] + [
-        "android.hardware.bluetooth@1.0",
-    ],
-}
-
-
 cc_library_static {
     name: "android.hardware.bluetooth-hci-mediatek",
     vendor: true,
-    defaults: ["hidl_defaults"],
+    defaults: ["mtk_bt_hal_defaults"],
     srcs: [
         "hci_packetizer.cc",
         "hci_protocol.cc",

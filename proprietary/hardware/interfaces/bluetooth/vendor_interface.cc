@@ -23,8 +23,10 @@
 #include <cutils/properties.h>
 #include <log/log.h>
 
+#include "bluetooth_address.h"
 #include "h4_protocol.h"
 #include "mct_protocol.h"
+#include "mediatek/hci_hal_debugger.h"
 
 static const char* VENDOR_LIBRARY_NAME = "libbt-vendor.so";
 static const char* VENDOR_LIBRARY_SYMBOL_NAME =
@@ -135,6 +137,11 @@ const bt_vendor_callbacks_t lib_callbacks = {
 
 }  // namespace
 
+#if defined(MTK_BT_HAL_H4_DEBUG) && (TRUE == MTK_BT_HAL_H4_DEBUG)
+using vendor::mediatek::bluetooth::hal::BtHciDebugger;
+using vendor::mediatek::bluetooth::hal::BtHciDebugBulletin;
+#endif
+
 namespace android {
 namespace hardware {
 namespace bluetooth {
@@ -203,8 +210,14 @@ bool VendorInterface::Open(InitializeCompleteCallback initialize_complete_cb,
     return false;
   }
 
-  // BT driver will get BD address from NVRAM for MTK solution
-  int status = lib_interface_->init(&lib_callbacks, NULL);
+  // Get the local BD address
+
+  uint8_t local_bda[BluetoothAddress::kBytes] = {0, 0, 0, 0, 0, 0};
+  if (!BluetoothAddress::get_local_address(local_bda)) {
+    // BT driver will get BD address from NVRAM for MTK solution
+    ALOGW("%s: No pre-set Bluetooth Address!", __func__);
+  }
+  int status = lib_interface_->init(&lib_callbacks, (unsigned char*)local_bda);
   if (status) {
     ALOGE("%s unable to initialize vendor library: %d", __func__, status);
     return false;
@@ -259,6 +272,14 @@ bool VendorInterface::Open(InitializeCompleteCallback initialize_complete_cb,
   // Initially, the power management is off.
   lpm_wake_deasserted = true;
 
+#if defined(MTK_BT_HAL_H4_DEBUG) && (TRUE == MTK_BT_HAL_H4_DEBUG)
+  if (fd_list[0] != INVALID_FD) {
+    BtHciDebugger::GetInstance()->RefreshHalDebugState();
+    BtHciDebugBulletin::GetInstance()->AddObserver(
+        BtHciDebugger::GetInstance());
+    BtHciDebugger::GetInstance()->RefreshVendorInterface(lib_interface_);
+  }
+#endif
   // Start configuring the firmware
   firmware_startup_timer_ = new FirmwareStartupTimer();
   lib_interface_->op(BT_VND_OP_FW_CFG, nullptr);
@@ -315,7 +336,7 @@ size_t VendorInterface::Send(uint8_t type, const uint8_t* data, size_t length) {
     ALOGV("%s: Sent wake before (%02x)", __func__, data[0] | (data[1] << 8));
   }
 
-  return hci_->Send(type, data, length);
+  return hci_ ? hci_->Send(type, data, length) : 0;
 }
 
 void VendorInterface::OnFirmwareConfigured(uint8_t result) {
@@ -327,6 +348,8 @@ void VendorInterface::OnFirmwareConfigured(uint8_t result) {
   }
 
   if (initialize_complete_cb_ != nullptr) {
+    LOG_ALWAYS_FATAL_IF((result != 0),
+        "%s: Failed to init firmware!", __func__);
     initialize_complete_cb_(result == 0);
     initialize_complete_cb_ = nullptr;
   }

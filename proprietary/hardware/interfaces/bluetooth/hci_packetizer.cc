@@ -23,6 +23,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include <thread>
+
 #include <log/log.h>
 
 namespace {
@@ -54,15 +56,23 @@ const hidl_vec<uint8_t>& HciPacketizer::GetPacket() const {
 void HciPacketizer::OnDataReady(int fd, HciPacketType packet_type) {
   switch (state_) {
     case HCI_PREAMBLE: {
-      ssize_t bytes_read = TEMP_FAILURE_RETRY(
-          read(fd, preamble_ + bytes_read_,
-               preamble_size_for_type[packet_type] - bytes_read_));
-      if (bytes_read <= 0) {
-        LOG_ALWAYS_FATAL_IF((bytes_read == 0),
-                            "%s: Unexpected EOF reading the header!", __func__);
-        LOG_ALWAYS_FATAL("%s: Read header error: %s", __func__,
-                         strerror(errno));
-      }
+      ssize_t bytes_read(0);
+      do {
+        bytes_read = TEMP_FAILURE_RETRY(
+            read(fd, preamble_ + bytes_read_,
+                 preamble_size_for_type[packet_type] - bytes_read_));
+        if (bytes_read <= 0) {
+          LOG_ALWAYS_FATAL_IF((bytes_read == 0),
+                              "%s: Unexpected EOF reading the header!", __func__);
+          // MTK BT driver anticipates BT service try again when EAGAIN reported
+          if (EAGAIN == errno) {
+            std::this_thread::yield();
+            continue;
+          }
+          LOG_ALWAYS_FATAL("%s: Read header error: %s", __func__,
+                           strerror(errno));
+        }
+      } while ((bytes_read < 0) && (EAGAIN == errno));
       bytes_read_ += bytes_read;
       if (bytes_read_ == preamble_size_for_type[packet_type]) {
         size_t packet_length =
@@ -77,17 +87,25 @@ void HciPacketizer::OnDataReady(int fd, HciPacketType packet_type) {
     }
 
     case HCI_PAYLOAD: {
-      ssize_t bytes_read = TEMP_FAILURE_RETRY(read(
-          fd,
-          packet_.data() + preamble_size_for_type[packet_type] + bytes_read_,
-          bytes_remaining_));
-      if (bytes_read <= 0) {
-        LOG_ALWAYS_FATAL_IF((bytes_read == 0),
-                            "%s: Unexpected EOF reading the payload!",
-                            __func__);
-        LOG_ALWAYS_FATAL("%s: Read payload error: %s", __func__,
-                         strerror(errno));
-      }
+      ssize_t bytes_read(0);
+      do {
+        bytes_read = TEMP_FAILURE_RETRY(read(
+            fd,
+            packet_.data() + preamble_size_for_type[packet_type] + bytes_read_,
+            bytes_remaining_));
+        if (bytes_read <= 0) {
+          LOG_ALWAYS_FATAL_IF((bytes_read == 0),
+                              "%s: Unexpected EOF reading the payload!",
+                              __func__);
+          // MTK BT driver anticipates BT service try again when EAGAIN reported
+          if (EAGAIN == errno) {
+            std::this_thread::yield();
+            continue;
+          }
+          LOG_ALWAYS_FATAL("%s: Read payload error: %s", __func__,
+                           strerror(errno));
+        }
+      } while ((bytes_read < 0) && (EAGAIN == errno));
       bytes_remaining_ -= bytes_read;
       bytes_read_ += bytes_read;
       if (bytes_remaining_ == 0) {

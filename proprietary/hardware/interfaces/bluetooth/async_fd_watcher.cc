@@ -83,7 +83,7 @@ int AsyncFdWatcher::tryStartThread() {
   if (std::atomic_exchange(&running_, true)) return 0;
 
   // Set up the communication channel
-  int pipe_fds[2];
+  int pipe_fds[2] = {INVALID_FD};
   if (pipe2(pipe_fds, O_NONBLOCK)) return -1;
 
   notification_listen_fd_ = pipe_fds[0];

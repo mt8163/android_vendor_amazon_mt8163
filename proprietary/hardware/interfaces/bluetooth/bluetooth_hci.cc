@@ -21,6 +21,12 @@
 
 #include "vendor_interface.h"
 
+#if defined(MTK_BT_HAL_STATE_MACHINE) && (TRUE == MTK_BT_HAL_STATE_MACHINE)
+#include "hci_hal_state_machine.h"
+using vendor::mediatek::bluetooth::hal::BtHalStateMessage;
+using vendor::mediatek::bluetooth::hal::StateMachine;
+#endif
+
 namespace android {
 namespace hardware {
 namespace bluetooth {
@@ -41,7 +47,13 @@ class BluetoothDeathRecipient : public hidl_death_recipient {
       const wp<::android::hidl::base::V1_0::IBase>& /*who*/) {
     ALOGE("BluetoothDeathRecipient::serviceDied - Bluetooth service died");
     has_died_ = true;
+#if defined(MTK_BT_HAL_STATE_MACHINE) && (TRUE == MTK_BT_HAL_STATE_MACHINE)
+    BluetoothHci *hci = (BluetoothHci*)mHci.get();
+    hci->UnlinkDeathReception();
+    StateMachine::GetInstance()->Transit(BtHalStateMessage::kOffMsg);
+#else
     mHci->close();
+#endif
   }
   sp<IBluetoothHci> mHci;
   bool getHasDied() const { return has_died_; }
@@ -64,7 +76,18 @@ Return<void> BluetoothHci::initialize(
 
   death_recipient_->setHasDied(false);
   cb->linkToDeath(death_recipient_, 0);
+  unlink_cb_ = [cb](sp<BluetoothDeathRecipient>& death_recipient) {
+    if (death_recipient->getHasDied())
+      ALOGI("Skipping unlink call, service died.");
+    else
+      cb->unlinkToDeath(death_recipient);
+  };
 
+#if defined(MTK_BT_HAL_STATE_MACHINE) && (TRUE == MTK_BT_HAL_STATE_MACHINE)
+  StateMachine::GetInstance()->Start();
+  StateMachine::GetInstance()->InitHciCallbacks(cb);
+  StateMachine::GetInstance()->Transit(BtHalStateMessage::kOnMsg);
+#else
   bool rc = VendorInterface::Initialize(
       [cb](bool status) {
         auto hidl_status = cb->initializationComplete(
@@ -97,13 +120,7 @@ Return<void> BluetoothHci::initialize(
       ALOGE("VendorInterface -> Unable to call initializationComplete(ERR)");
     }
   }
-
-  unlink_cb_ = [cb](sp<BluetoothDeathRecipient>& death_recipient) {
-    if (death_recipient->getHasDied())
-      ALOGI("Skipping unlink call, service died.");
-    else
-      cb->unlinkToDeath(death_recipient);
-  };
+#endif
 
   return Void();
 }
@@ -111,7 +128,11 @@ Return<void> BluetoothHci::initialize(
 Return<void> BluetoothHci::close() {
   ALOGI("BluetoothHci::close()");
   unlink_cb_(death_recipient_);
+#if defined(MTK_BT_HAL_STATE_MACHINE) && (TRUE == MTK_BT_HAL_STATE_MACHINE)
+  StateMachine::GetInstance()->Transit(BtHalStateMessage::kOffMsg);
+#else
   VendorInterface::Shutdown();
+#endif
   return Void();
 }
 
@@ -130,12 +151,22 @@ Return<void> BluetoothHci::sendScoData(const hidl_vec<uint8_t>& data) {
   return Void();
 }
 
+#if defined(MTK_BT_HAL_STATE_MACHINE) && (TRUE == MTK_BT_HAL_STATE_MACHINE)
+void BluetoothHci::UnlinkDeathReception() {
+  unlink_cb_(death_recipient_);
+}
+#endif
+
 void BluetoothHci::sendDataToController(const uint8_t type,
                                         const hidl_vec<uint8_t>& data) {
   VendorInterface::get()->Send(type, data.data(), data.size());
 }
 
 IBluetoothHci* HIDL_FETCH_IBluetoothHci(const char* /* name */) {
+  ALOGI("Init IBluetoothHCI");
+#if defined(MTK_BT_HAL_STATE_MACHINE) && (TRUE == MTK_BT_HAL_STATE_MACHINE)
+  StateMachine::GetInstance()->Start();
+#endif
   return new BluetoothHci();
 }
 

@@ -90,6 +90,8 @@ size_t HciProtocol::WritevSafely(int fd, struct iovec* iov, int iovcnt) {
       // consume entire iovec
       ret -= iov->iov_len;
       --iovcnt;
+      if (iovcnt == 0)
+        return transmitted_length;
       ++iov;
     }
 

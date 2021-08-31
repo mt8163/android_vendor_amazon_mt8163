@@ -3,6 +3,7 @@ service bluetooth-1-0 /vendor/bin/hw/android.hardware.bluetooth@1.0-service-medi
     user bluetooth
     group bluetooth
     writepid /dev/stune/foreground/tasks
+    capabilities SYS_NICE
 
 on property:vts.native_server.on=1 && property:ro.build.type=userdebug
     stop bluetooth-1-0

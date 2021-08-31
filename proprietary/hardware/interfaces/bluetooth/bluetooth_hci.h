@@ -43,6 +43,9 @@ class BluetoothHci : public IBluetoothHci {
   Return<void> sendAclData(const hidl_vec<uint8_t>& data) override;
   Return<void> sendScoData(const hidl_vec<uint8_t>& data) override;
   Return<void> close() override;
+#if defined(MTK_BT_HAL_STATE_MACHINE) && (TRUE == MTK_BT_HAL_STATE_MACHINE)
+  void UnlinkDeathReception();
+#endif
 
  private:
   void sendDataToController(const uint8_t type, const hidl_vec<uint8_t>& data);
