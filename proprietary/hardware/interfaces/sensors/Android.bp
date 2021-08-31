@@ -11,6 +11,7 @@ cc_library_shared {
         "libhardware",
         "libbase",
         "libutils",
+        "libhidlbase",
         "android.hardware.sensors@1.0",
     ],
 
@@ -37,6 +38,7 @@ cc_binary {
         "libhardware_legacy",
         "libhardware",
     ] + [
+        "libhidlbase",
         "android.hardware.sensors@1.0",
     ],
 
