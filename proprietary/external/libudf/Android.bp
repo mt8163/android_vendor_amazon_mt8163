@@ -57,7 +57,7 @@ cc_library_shared {
 
     include_dirs: [
         "vendor/amazon/mt8163/proprietary/external/aee/binary/inc",
-        "system/core/libunwindstack/include"
+        "system/unwinding/libunwindstack/include"
     ],
 
     local_include_dirs: ["include"],

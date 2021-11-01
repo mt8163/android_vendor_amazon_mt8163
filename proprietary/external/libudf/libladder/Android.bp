@@ -10,8 +10,8 @@ cc_library {
     proprietary: true,
     owner: "mtk",
     include_dirs: [
-        "system/core/libunwindstack",
         "system/core/base/include",
+        "system/unwinding/libunwindstack/include",
         ],
     shared_libs: [
         "libunwindstack",
