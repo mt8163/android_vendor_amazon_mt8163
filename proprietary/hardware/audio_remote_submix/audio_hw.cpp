@@ -779,7 +779,7 @@ static audio_channel_mask_t out_get_channels(const struct audio_stream *stream)
 {
     const struct submix_stream_out * const out = audio_stream_get_submix_stream_out(
             const_cast<struct audio_stream *>(stream));
-    uint32_t channel_mask = out->dev->routes[out->route_handle].config.output_channel_mask;
+    audio_channel_mask_t channel_mask = out->dev->routes[out->route_handle].config.output_channel_mask;
     MTK_ALOGV("out_get_channels() returns %08x", channel_mask);
     return channel_mask;
 }
