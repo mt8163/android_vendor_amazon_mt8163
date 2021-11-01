@@ -338,11 +338,11 @@ static int wpa_driver_nl80211_testmode(void *priv, const u8 *data, size_t data_l
         {
             struct wpa_driver_get_sta_statistics_params *sta_params =
                            (struct wpa_driver_get_sta_statistics_params *)data;
-            return send_and_recv_msgs(drv, msg, testmode_sta_statistics_handler, sta_params->buf);
+            return send_and_recv_msgs(drv, msg, testmode_sta_statistics_handler, sta_params->buf, NULL, NULL);
         }
         default:
         {
-            int ret = send_and_recv_msgs(drv, msg, NULL, NULL);
+            int ret = send_and_recv_msgs(drv, msg, NULL, NULL, NULL, NULL);
             wpa_printf(MSG_EXCESSIVE, "ret=%d, nl=%p", ret, drv->global->nl);
             return ret;
         }
