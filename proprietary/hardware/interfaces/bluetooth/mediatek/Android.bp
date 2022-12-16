@@ -19,7 +19,7 @@ cc_library_static {
     defaults: ["mtk_bt_hal_defaults"],
     local_include_dirs: ["."],
     include_dirs: [
-        "system/core/base/include",
+        "system/libbase/include",
         "vendor/amazon/mt8163/proprietary/hardware/interfaces/bluetooth/",
     ],
 
@@ -45,7 +45,7 @@ cc_library_static {
     defaults: ["mtk_bt_hal_defaults"],
     local_include_dirs: ["."],
     include_dirs: [
-        "system/core/base/include",
+        "system/libbase/include",
         "vendor/amazon/mt8163/proprietary/hardware/interfaces/bluetooth/",
     ],
 
@@ -74,7 +74,7 @@ cc_test {
         "test",
     ],
 	include_dirs: [
-		"system/core/base/include",
+		"system/libbase/include",
 		"vendor/amazon/mt8163/proprietary/hardware/interfaces/bluetooth/",
 	],
     srcs: [
