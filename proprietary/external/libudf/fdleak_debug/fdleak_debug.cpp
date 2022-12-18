@@ -1105,11 +1105,11 @@ void fdleak_record_backtrace(int fd) {
                 pc = entry->backtrace[i];
 
                 if (success) {
-                    unwindstack::MapInfo *map_info = maps.Find(pc);
+                     std::shared_ptr<unwindstack::MapInfo> map_info = maps.Find(pc);
 
                     if (map_info) {
                         unwindstack::Elf *elf = map_info->GetElf(process_memory, unwindstack::Regs::CurrentArch());
-                        relativ_pc = elf->GetRelPc(pc, map_info);
+                        relativ_pc = elf->GetRelPc(pc, map_info.get());
                     } else {
                         relativ_pc = pc;
                     }
