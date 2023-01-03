@@ -1,0 +1,26 @@
+// Copyright 2006 The Android Open Source Project
+
+cc_binary {
+
+    name: "thermal",
+    proprietary: true,
+    owner: "mtk",
+    
+    srcs: ["thermal.c"],
+
+    include_dirs: [
+        "hardware/libhardware_legacy/include",
+        "hardware/libhardware/include",
+    ],
+    local_include_dirs: [""],
+
+    init_rc: ["init.thermal.rc"],
+    shared_libs: [
+        "libcutils",
+        "libc",
+        "libifcutils_mtk",
+        "libdl",
+        "liblog",
+    ],
+
+}

@@ -18,7 +18,9 @@ LOCAL_PATH_VENDOR := vendor/amazon/mt8163
 
 # Thermal Manager
 PRODUCT_PACKAGES += \
-   thermal_manager
+   thermal_manager \
+   thermal \
+   libifcutils_mtk
 
 # Debugging tool
 PRODUCT_PACKAGES +=\
