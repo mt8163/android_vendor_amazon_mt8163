@@ -1,76 +1,58 @@
-### Building
+## Building LineageOS 20.0
 
-The build process is quite long and requires fair knowledge of Linux and its command line.
+Building LineageOS 20.0 from source requires some familiarity with Linux and the command line. Follow these steps to get started:
 
-#### 1. Install Google's repo tool
+# Step 1: Install Google's Repo tool
 
+#### Before you begin, make sure you have the necessary tools:
 ```bash
-# Add binary folder
-mkdir -p ~/bin
-# Add folder to path
-PATH=~/bin:$PATH
-curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
-chmod a+x ~/bin/repo
-source ~/.profile
+sudo apt-get install bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg gperf imagemagick lib32ncurses5-dev lib32readline-dev lib32z1-dev liblz4-tool libncurses5 libncurses5-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev
 ```
 
-Further reading: https://source.android.com/setup/build/downloading
-
-#### 2. Download the Lineage OS 17.1 source code
-
-You may have to restart your shell after Step 1 to refresh the PATH variable.
-
-*Please note that this can take a very long time. At around 3 MB/s, it can take upwards of 1 hour!*
-
+# Now, install Google's repo tool:
 ```bash
-# Create soruce directory and cd into it
+mkdir -p ~/bin
+echo 'PATH=~/bin:$PATH' >> ~/.bashrc
+source ~/.bashrc
+curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+chmod a+x ~/bin/repo
+```
+
+# Step 2: Download LineageOS 20.0 source code
+
+#### Create a directory for LineageOS source code and navigate to it
+```bash
 mkdir -p ~/android/lineage
-cd <folder to contain source>
-# Initialise repo tool
-repo init -u git://github.com/mt8163/android.git -b lineage-17.1
-git clone https://github.com/mt8163/local_manifests -b lineage-17.1 .repo/local_manifests
+cd ~/android/lineage
+```
+
+#### Initialize repo tool with LineageOS 20.1 source
+```bash
+repo init -u git://github.com/mt8163/android.git -b lineage-20.0
+git clone https://github.com/mt8163/local_manifests -b lineage-20.0 .repo/local_manifests
 repo sync
 ```
 
-#### 4. Build!
+# Step 3: Build LineageOS
+
+#### Make sure you have `adb` and `fastboot` installed and in your PATH. If not, follow the instructions here: [ADB and Fastboot installation guide](https://wiki.lineageos.org/devices/bacon/build#build-lineageos-and-lineageos-recovery)
 ```bash
-curl  https://raw.githubusercontent.com/488315/build_scripts/master/build.sh > build.sh
-```
-
-
-
-**Ensure you have `adb` and `fastboot` installed and in your path before continuing!**
-Learn how to do this here: https://wiki.lineageos.org/devices/bacon/build#build-lineageos-and-lineageos-recovery
-
-```bash
-# Ubuntu 16.04 and newer
-apt-get install bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg gperf imagemagick lib32ncurses5-dev lib32readline-dev lib32z1-dev liblz4-tool libncurses5 libncurses5-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev
-
-# Older than Ubuntu 16.04
-apt-get install bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg gperf imagemagick lib32ncurses5-dev lib32readline-dev lib32z1-dev liblz4-tool libncurses5-dev libsdl1.2-dev libssl-dev libwxgtk2.8-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev
-
-# All versions
-croot
-source ./build/envsetup.sh
+source build/envsetup.sh
 brunch lineage_karnak-userdebug
 ```
+#### Improving build times with ccache
 
-### Improving build times
-
-To speed up subsequent builds, you can enable ccache support. You can do this by running this command before each build:
+#### To speed up future builds, you can enable ccache support. Run the following command before each build:
 ```bash
 export USE_CCACHE=1
 ```
-You can also add this line to your `~/.bashrc` file. After, you need to specify the maximum disk space ccache can use:
+#### To persistently enable ccache and set the maximum disk space it can use, add the following lines to your `~/.bashrc` file:
 ```bash
-# 25 GB
-ccache -M 25G
-# 50 GB (recommended)
-ccache -M 50G
-# 75 GB
-ccache -M 75G
+export USE_CCACHE=1
+ccache -M 50G # Set cache size to 50GB (adjust as needed)
 ```
-> This needs to be run once. Anywhere from 25GB-100GB will result in very noticeably increased build speeds (for instance, a typical 1hr build time can be reduced to 20min). **If you’re only building for one device, 25GB-50GB is fine.** If you plan to build for several devices that do not share the same kernel source, aim for 75GB-100GB. This space will be permanently occupied on your drive, so take this into consideration.
->
-> [*From Lineage OS Wiki*](https://wiki.lineageos.org/devices/bacon/build#turn-on-caching-to-speed-up-build)
+#### Using ccache can significantly reduce build times, so consider allocating enough disk space for caching.
 
+>* Note: The above instructions are meant for LineageOS 20.0. Make sure to use the appropriate branch and repository URLs for other versions.
+
+#### For more details and troubleshooting, refer to the official LineageOS documentation: [LineageOS Wiki](https://wiki.lineageos.org/devices/bacon/build#turn-on-caching-to-speed-up-build)
