@@ -64,7 +64,6 @@ cc_library_shared {
 
     name: "libudf",
     proprietary: true,
-    clang: true,
     sanitize: {
         never: true,
     },
