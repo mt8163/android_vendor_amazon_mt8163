@@ -39,3 +39,7 @@ PRODUCT_PROPERTY_OVERRIDES  += \
    ro.config.hw_quickpoweron=true \
    ro.build.shutdown_timeout=0
 
+# Charger
+PRODUCT_PACKAGES += \
+    charger_res_images \
+    product_charger_res_images
