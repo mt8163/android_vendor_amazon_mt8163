@@ -86,8 +86,8 @@ LOCAL_C_INCLUDES+= \
         $(MTK_PATH_SOURCE)/hardware/sensor/ \
         $(MTK_PATH_CUSTOM)/hal/sensors/sensor \
         $(TOP)/frameworks/av/media/libstagefright/include \
-        $(LOCAL_PATH)/include
-
+        $(LOCAL_PATH)/include \
+        $(MTK_PATH_SOURCE)/hardware/include
 LOCAL_CFLAGS += -DCUSTOM_KERNEL_ALS
 LOCAL_CFLAGS += -DCUSTOM_KERNEL_ACCELEROMETER
 
