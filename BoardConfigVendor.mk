@@ -25,3 +25,6 @@ MTK_PATH_CUSTOM := vendor/amazon/mt8163/proprietary/custom/$(MTK_PROJECT)
 MTK_PATH_SOURCE := vendor/amazon/mt8163/proprietary
 MTK_ROOT := vendor/amazon/mt8163/proprietary
 
+
+include vendor/amazon/mt8163/config/BoardConfigKernel.mk
+include vendor/amazon/mt8163/config/BoardConfigSoong.mk

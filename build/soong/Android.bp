@@ -1,0 +1,510 @@
+// Custom soong configs
+
+bootstrap_go_package {
+    name: "soong-custom-generator",
+    pkgPath: "aosp/soong/generator",
+    deps: [
+        "blueprint",
+        "blueprint-pathtools",
+        "soong",
+        "soong-android",
+        "soong-shared",
+    ],
+    srcs: [
+        "generator/generator.go",
+        "generator/variables.go",
+    ],
+    pluginFor: ["soong_build"],
+}
+
+custom_generator {
+    name: "generated_kernel_includes",
+
+    // The headers make command
+    cmd: "$(PATH_OVERRIDE_SOONG) $(KERNEL_MAKE_CMD) $(KERNEL_MAKE_FLAGS) -C $(TARGET_KERNEL_HEADERS) O=$(KERNEL_BUILD_OUT_PREFIX)$(genDir) ARCH=$(KERNEL_ARCH) $(KERNEL_CROSS_COMPILE) headers_install",
+
+    // Directories that can be imported by a cc_* module generated_headers property
+    export_include_dirs: [
+        "usr/audio/include/uapi",
+        "usr/include",
+        "usr/include/audio",
+        "usr/include/audio/include/uapi",
+        "usr/techpack/audio/include",
+    ],
+
+    // Sources for dependency tracking
+    dep_root: "$(TARGET_KERNEL_HEADERS)",
+    dep_files: [
+        "Makefile",
+        "include/**/*",
+        "arch/$(KERNEL_ARCH)/include/**/*",
+        "techpack/audio/include/**/*",
+    ],
+}
+
+cc_library_headers {
+    name: "generated_kernel_headers",
+    generated_headers: ["generated_kernel_includes"],
+    export_generated_headers: ["generated_kernel_includes"],
+    vendor_available: true,
+    recovery_available: true,
+}
+
+// Target platform agnostic config modules
+soong_config_module_type {
+    name: "camera_needs_client_info",
+    module_type: "cc_defaults",
+    config_namespace: "customGlobalVars",
+    bool_variables: ["camera_needs_client_info"],
+    properties: ["cppflags"],
+}
+
+camera_needs_client_info {
+    name: "camera_needs_client_info_defaults",
+    soong_config_variables: {
+        camera_needs_client_info: {
+            cppflags: ["-DCAMERA_NEEDS_CLIENT_INFO"],
+        },
+    },
+}
+
+soong_config_module_type {
+    name: "camera_needs_client_info_lib",
+    module_type: "cc_defaults",
+    config_namespace: "customGlobalVars",
+    bool_variables: ["camera_needs_client_info_lib"],
+    properties: [
+        "cppflags",
+        "shared_libs",
+    ],
+}
+camera_needs_client_info_lib {
+    name: "camera_needs_client_info_lib_defaults",
+    soong_config_variables: {
+        camera_needs_client_info_lib: {
+            cppflags: ["-DCAMERA_NEEDS_CLIENT_INFO_LIB"],
+            shared_libs: ["//hardware/oneplus:vendor.oneplus.hardware.camera@1.0"],
+        },
+    },
+}
+
+soong_config_module_type {
+    name: "aapt_version_code",
+    module_type: "java_defaults",
+    config_namespace: "lineageGlobalVars",
+    value_variables: ["aapt_version_code"],
+    properties: ["aaptflags"],
+}
+
+aapt_version_code {
+    name: "aapt_version_code_defaults",
+    soong_config_variables: {
+        aapt_version_code: {
+            aaptflags: [
+                "--version-code",
+                "%s",
+            ],
+        },
+    },
+}
+
+
+soong_config_module_type {
+    name: "camera_uses_newer_hidl_override_format",
+    module_type: "cc_defaults",
+    config_namespace: "customGlobalVars",
+    bool_variables: ["camera_uses_newer_hidl_override_format"],
+    properties: [
+        "cflags",
+        "cppflags",
+    ],
+}
+
+camera_uses_newer_hidl_override_format {
+    name: "camera_uses_newer_hidl_override_format_defaults",
+    soong_config_variables: {
+        camera_uses_newer_hidl_override_format: {
+            cflags: ["-DTARGET_CAMERA_USES_NEWER_HIDL_OVERRIDE_FORMAT"],
+            cppflags: ["-DTARGET_CAMERA_USES_NEWER_HIDL_OVERRIDE_FORMAT"],
+        },
+    },
+}
+
+soong_config_module_type {
+    name: "target_alternative_futex_waiters",
+    module_type: "cc_defaults",
+    config_namespace: "customGlobalVars",
+    bool_variables: ["target_alternative_futex_waiters"],
+    properties: [
+        "cflags",
+        "cppflags",
+    ],
+}
+
+target_alternative_futex_waiters {
+    name: "target_alternative_futex_waiters_defaults",
+    soong_config_variables: {
+        target_alternative_futex_waiters: {
+            cflags: ["-DTARGET_ALTERNATIVE_FUTEX_WAITERS"],
+            cppflags: ["-DTARGET_ALTERNATIVE_FUTEX_WAITERS"],
+        },
+    },
+}
+
+soong_config_module_type {
+    name: "camera_needs_client_info_lib_oplus",
+    module_type: "cc_defaults",
+    config_namespace: "customGlobalVars",
+    bool_variables: ["camera_needs_client_info_lib_oplus"],
+    properties: [
+        "cppflags",
+        "shared_libs",
+    ],
+}
+
+camera_needs_client_info_lib_oplus {
+    name: "camera_needs_client_info_lib_oplus_defaults",
+    soong_config_variables: {
+        camera_needs_client_info_lib_oplus: {
+            cppflags: ["-DCAMERA_NEEDS_CLIENT_INFO_LIB_OPLUS"],
+            shared_libs: ["vendor.oplus.hardware.cameraMDM@2.0"],
+        },
+    },
+}
+
+soong_config_module_type {
+    name: "gralloc_10_usage_bits",
+    module_type: "cc_defaults",
+    config_namespace: "customGlobalVars",
+    value_variables: ["additional_gralloc_10_usage_bits"],
+    properties: ["cppflags"],
+}
+
+gralloc_10_usage_bits {
+    name: "gralloc_10_usage_bits_defaults",
+    soong_config_variables: {
+        additional_gralloc_10_usage_bits: {
+            cppflags: ["-DADDNL_GRALLOC_10_USAGE_BITS=%s"],
+        },
+    },
+}
+
+soong_config_module_type {
+    name: "gralloc_handle_custom_content_md_reserved_size",
+    module_type: "cc_defaults",
+    config_namespace: "lineageGlobalVars",
+    bool_variables: ["gralloc_handle_has_custom_content_md_reserved_size"],
+    properties: ["export_cflags"],
+}
+
+gralloc_handle_custom_content_md_reserved_size {
+    name: "gralloc_handle_has_custom_content_md_reserved_size_defaults",
+    soong_config_variables: {
+        gralloc_handle_has_custom_content_md_reserved_size: {
+            export_cflags: ["-DGRALLOC_HANDLE_HAS_CUSTOM_CONTENT_MD_RESERVED_SIZE"],
+        },
+    },
+}
+
+soong_config_module_type {
+    name: "gralloc_handle_reserved_size",
+    module_type: "cc_defaults",
+    config_namespace: "customGlobalVars",
+    bool_variables: ["gralloc_handle_has_reserved_size"],
+    properties: ["export_cflags"],
+}
+
+gralloc_handle_reserved_size {
+    name: "gralloc_handle_has_reserved_size_defaults",
+    soong_config_variables: {
+        gralloc_handle_has_reserved_size: {
+            export_cflags: ["-DGRALLOC_HANDLE_HAS_RESERVED_SIZE"],
+        },
+    },
+}
+
+soong_config_module_type {
+    name: "target_shim_libs",
+    module_type: "cc_defaults",
+    config_namespace: "customGlobalVars",
+    value_variables: ["target_ld_shim_libs"],
+    properties: ["cppflags"],
+}
+
+target_shim_libs {
+    name: "shim_libs_defaults",
+    soong_config_variables: {
+        target_ld_shim_libs: {
+            cppflags: ["-DLD_SHIM_LIBS=\"%s\""],
+        },
+    },
+}
+
+soong_config_module_type {
+    name: "vendor_init",
+    module_type: "cc_defaults",
+    config_namespace: "customGlobalVars",
+    value_variables: ["target_init_vendor_lib"],
+    properties: ["whole_static_libs"],
+}
+
+vendor_init {
+    name: "vendor_init_defaults",
+    soong_config_variables: {
+        target_init_vendor_lib: {
+            whole_static_libs: ["%s"],
+        },
+    },
+}
+
+soong_config_module_type {
+    name: "surfaceflinger_udfps_lib",
+    module_type: "cc_defaults",
+    config_namespace: "customGlobalVars",
+    value_variables: ["target_surfaceflinger_udfps_lib"],
+    properties: [
+        "cppflags",
+        "whole_static_libs",
+    ],
+}
+
+surfaceflinger_udfps_lib {
+    name: "surfaceflinger_udfps_lib_defaults",
+    soong_config_variables: {
+        target_surfaceflinger_udfps_lib: {
+            cppflags: ["-DTARGET_PROVIDES_UDFPS_LIB"],
+            whole_static_libs: ["%s"],
+        },
+    },
+}
+
+soong_config_module_type {
+    name: "target_uses_prebuilt_dynamic_partitions",
+    module_type: "cc_defaults",
+    config_namespace: "customGlobalVars",
+    bool_variables: ["target_uses_prebuilt_dynamic_partitions"],
+    properties: ["cppflags"],
+}
+
+target_uses_prebuilt_dynamic_partitions {
+    name: "target_uses_prebuilt_dynamic_partitions_defaults",
+    soong_config_variables: {
+        target_uses_prebuilt_dynamic_partitions: {
+            cppflags: ["-DTARGET_USES_PREBUILT_DYNAMIC_PARTITIONS"],
+        },
+    },
+}
+
+soong_config_module_type {
+    name: "needs_camera_boottime",
+    module_type: "cc_defaults",
+    config_namespace: "customGlobalVars",
+    bool_variables: ["needs_camera_boottime"],
+    properties: ["cppflags"],
+}
+
+needs_camera_boottime {
+    name: "needs_camera_boottime_defaults",
+    soong_config_variables: {
+        needs_camera_boottime: {
+            cppflags: ["-DTARGET_CAMERA_BOOTTIME_TIMESTAMP"],
+        },
+    },
+}
+
+
+soong_config_module_type {
+    name: "bootloader_message_offset",
+    module_type: "cc_defaults",
+    config_namespace: "customGlobalVars",
+    value_variables: ["bootloader_message_offset"],
+    properties: [
+        "cflags",
+        "export_cflags",
+    ],
+}
+
+bootloader_message_offset {
+    name: "bootloader_message_offset_defaults",
+    soong_config_variables: {
+        bootloader_message_offset: {
+            cflags: ["-DBOARD_RECOVERY_BLDRMSG_OFFSET=%s"],
+            export_cflags: ["-DBOARD_RECOVERY_BLDRMSG_OFFSET=%s"],
+        },
+    },
+}
+
+soong_config_module_type {
+    name: "egl_display_array",
+    module_type: "cc_defaults",
+    config_namespace: "customGlobalVars",
+    bool_variables: ["uses_egl_display_array"],
+    properties: ["cflags"],
+}
+
+egl_display_array {
+    name: "egl_display_array_defaults",
+    soong_config_variables: {
+        uses_egl_display_array: {
+            cflags: ["-DEGL_DISPLAY_ARRAY"],
+        },
+    },
+}
+
+// NVIDIA specific config modules
+soong_config_module_type {
+    name: "nvidia_enhancements",
+    module_type: "cc_defaults",
+    config_namespace: "customNvidiaVars",
+    bool_variables: ["uses_nvidia_enhancements"],
+    properties: ["cppflags"],
+}
+
+nvidia_enhancements {
+    name: "nvidia_enhancements_defaults",
+    soong_config_variables: {
+        uses_nvidia_enhancements: {
+            cppflags: ["-DNV_ANDROID_FRAMEWORK_ENHANCEMENTS"],
+        },
+    },
+}
+
+soong_config_module_type {
+    name: "disable_bluetooth_le_read_buffer_size_v2",
+    module_type: "cc_defaults",
+    config_namespace: "customGlobalVars",
+    bool_variables: ["disable_bluetooth_le_read_buffer_size_v2"],
+    properties: ["cppflags"],
+}
+
+disable_bluetooth_le_read_buffer_size_v2 {
+    name: "disable_bluetooth_le_read_buffer_size_v2_defaults",
+    soong_config_variables: {
+        disable_bluetooth_le_read_buffer_size_v2: {
+            cppflags: ["-DDISABLE_LE_READ_BUFFER_SIZE_V2"],
+        },
+    },
+}
+
+soong_config_module_type {
+    name: "disable_bluetooth_le_set_host_feature",
+    module_type: "cc_defaults",
+    config_namespace: "customGlobalVars",
+    bool_variables: ["disable_bluetooth_le_set_host_feature"],
+    properties: ["cppflags"],
+}
+
+disable_bluetooth_le_set_host_feature {
+    name: "disable_bluetooth_le_set_host_feature_defaults",
+    soong_config_variables: {
+        disable_bluetooth_le_set_host_feature: {
+            cppflags: ["-DDISABLE_LE_SET_HOST_FEATURE"],
+        },
+    },
+}
+
+// QCOM specific config modules
+soong_config_module_type {
+    name: "librmnetctl_pre_uplink",
+    module_type: "cc_defaults",
+    config_namespace: "customQcomVars",
+    bool_variables: ["uses_pre_uplink_features_netmgrd"],
+    properties: ["cflags"],
+}
+
+librmnetctl_pre_uplink {
+    name: "librmnetctl_pre_uplink_defaults",
+    soong_config_variables: {
+        uses_pre_uplink_features_netmgrd: {
+            cflags: ["-DNO_UPLINK_FEATURES"],
+        },
+    },
+}
+
+soong_config_module_type {
+    name: "extended_compress_format",
+    module_type: "cc_defaults",
+    config_namespace: "customQcomVars",
+    bool_variables: ["supports_extended_compress_format"],
+    properties: ["cflags"],
+}
+
+extended_compress_format {
+    name: "extended_compress_format_defaults",
+    soong_config_variables: {
+        supports_extended_compress_format: {
+            cflags: ["-DENABLE_EXTENDED_COMPRESS_FORMAT"],
+        },
+    },
+}
+
+soong_config_module_type {
+    name: "surfaceflinger_qcom_extensions",
+    module_type: "cc_defaults",
+    config_namespace: "customQcomVars",
+    value_variables: ["qcom_display_headers_namespace"],
+    properties: [
+        "cppflags",
+        "header_libs",
+    ],
+}
+
+surfaceflinger_qcom_extensions {
+    name: "surfaceflinger_qcom_ext_defaults",
+    soong_config_variables: {
+        qcom_display_headers_namespace: {
+            cppflags: ["-DQCOM_UM_FAMILY"],
+            header_libs: ["//%s:display_intf_headers"],
+        },
+    },
+}
+
+soong_config_module_type {
+    name: "inputdispatcher_skip_event_key",
+    module_type: "cc_defaults",
+    config_namespace: "customGlobalVars",
+    value_variables: ["target_inputdispatcher_skip_event_key"],
+    properties: ["cppflags"],
+}
+
+inputdispatcher_skip_event_key {
+    name: "inputdispatcher_skip_event_key_defaults",
+    soong_config_variables: {
+        target_inputdispatcher_skip_event_key: {
+            cppflags: ["-DINPUTDISPATCHER_SKIP_EVENT_KEY=%s"],
+        },
+    },
+}
+
+soong_config_module_type {
+    name: "uses_legacy_fd_fbdev",
+    module_type: "cc_defaults",
+    config_namespace: "customGlobalVars",
+    bool_variables: ["uses_legacy_fd_fbdev"],
+    properties: ["cppflags"],
+}
+
+uses_legacy_fd_fbdev {
+    name: "uses_legacy_fd_fbdev_defaults",
+    soong_config_variables: {
+        uses_legacy_fd_fbdev: {
+            cppflags: ["-DUSES_LEGACY_FD_FBDEV"],
+        },
+    },
+}
+
+soong_config_module_type {
+    name: "needs_oplus_tag",
+    module_type: "cc_defaults",
+    config_namespace: "customGlobalVars",
+    bool_variables: ["needs_oplus_tag"],
+    properties: ["cppflags"],
+}
+needs_oplus_tag {
+    name: "needs_oplus_vendor_tag",
+    soong_config_variables: {
+        needs_oplus_tag: {
+            cppflags: ["-DNEEDS_OPLUS_VENDOR_TAG"],
+        },
+    },
+}
