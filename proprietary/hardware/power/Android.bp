@@ -30,4 +30,29 @@ cc_library_shared {
     owner: "mtk",
 
 }
+cc_binary {
 
+    name: "android.hardware.power@1.3-service.mt8163",
+    init_rc: ["android.hardware.power@1.3-service.mt8163.rc"],
+    relative_install_path: "hw",
+    vendor: true,
+
+    local_include_dirs: ["include"],
+
+    srcs: [
+        "service.cpp",
+        "Power.cpp",
+    ],
+
+    shared_libs: [
+        "libbase",
+        "libutils",
+        "libhidlbase",
+        "libhidltransport",
+        "android.hardware.power@1.0",
+        "android.hardware.power@1.1",
+        "android.hardware.power@1.2",
+        "android.hardware.power@1.3",
+    ],
+
+}
