@@ -10,7 +10,6 @@ cc_library_shared {
         "ubrd_core/dump.c",
         "mmap_debug/mmap_debug.c",
         "fdleak_debug/fdleak_debug.cpp",
-        // "pthread_debug/pthread_debug.cpp",
     ],
 
     arch: {
@@ -50,7 +49,6 @@ cc_library_shared {
         eng: {
             cflags: [
                 "-D_MTK_ENG_",
-                // "-D_MTK_PTHREAD_DEBUG_",
             ],
         },
     },
@@ -64,7 +62,6 @@ cc_library_shared {
 
     name: "libudf",
     proprietary: true,
-    clang: true,
     sanitize: {
         never: true,
     },
