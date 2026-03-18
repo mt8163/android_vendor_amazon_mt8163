@@ -16,7 +16,7 @@ cc_binary {
     name: "thermal_manager",
     compile_multilib: "32",
 
-    srcs: ["thermal_manager.c"],
+    srcs: ["thermal_manager.cpp"],
     shared_libs: [
         "libdl",
         "libcutils",

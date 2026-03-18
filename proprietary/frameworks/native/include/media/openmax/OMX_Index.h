@@ -363,7 +363,6 @@ typedef enum OMX_INDEXTYPE {
     OMX_IndexVendorMtkOmxVdecANW_HWComposer,
     OMX_IndexVendorMtkOmxVencNonRefPOp = 0x7F000040,    //for non ref p operation   /**< reference: OMX_PARAM_U32TYPE */
     OMX_IndexVendorMtkOmxVdecLowLatencyDecode,    /**< reference: OMX_PARAM_U32TYPE */
-    OMX_IndexVendorMtkOmxVdecSetHeifGridNum,     /**< reference: OMX_PARAM_U32TYPE */
 
     //Gary Wu add for ACodec color convert to get MVA addrs
     //OMX_IndexVendorMtkOmxVdecACodecColorConvertGetMVAAddr = 0x7F0FF001,
@@ -414,13 +413,6 @@ typedef enum OMX_INDEXTYPE {
 
     OMX_IndexVendorMtkOmxVencSeResolutionChange,
     OMX_IndexVendorMtkOmxVencInputScaling,
-
-    OMX_IndexVendorMtkOmxVencRoiSwitch,
-    OMX_IndexVendorMtkOmxVencRoiSize,
-    OMX_IndexVendorMtkOmxVencRoiInfo,
-    OMX_IndexVendorMtkOmxVencRoiLicenseSize,
-    OMX_IndexVendorMtkOmxVencRoiLicense,
-
 
     OMX_IndexMax = 0x7FFFFFFF
 

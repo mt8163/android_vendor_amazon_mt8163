@@ -26,10 +26,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES +=\
    debug_tool
 
-# vold fix
-PRODUCT_PACKAGES += \
-   vold_fix
-
 # Kernel modules loader
 PRODUCT_COPY_FILES += \
    $(LOCAL_PATH_VENDOR)/proprietary/external/insmod/init.insmod.sh:$(TARGET_COPY_OUT_VENDOR)/bin/init.insmod.sh \
@@ -39,3 +35,7 @@ PRODUCT_PROPERTY_OVERRIDES  += \
    ro.config.hw_quickpoweron=true \
    ro.build.shutdown_timeout=0
 
+# OMX libraries
+PRODUCT_PACKAGES += \
+   libstagefrighthw \
+   libMtkOmxCore

@@ -1,5 +1,13 @@
 cc_library_headers {
-    name: "mtk_openmax_headers",
-    export_include_dirs: [".", "media/openmax"],
+    name: "mediatek_openmax_header",
+    export_include_dirs: ["media/openmax"],
+    vendor_available: true,
+}
+
+cc_library_headers {
+    name: "mtk_openmax_include",
+    export_include_dirs: ["."],
+    header_libs: ["mediatek_openmax_header"],
+    export_header_lib_headers: ["mediatek_openmax_header"],
     vendor_available: true,
 }

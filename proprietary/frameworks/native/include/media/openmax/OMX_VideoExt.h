@@ -164,8 +164,6 @@ typedef enum OMX_VIDEO_VP9PROFILETYPE {
     // HDR profiles also support passing HDR metadata
     OMX_VIDEO_VP9Profile2HDR = 0x1000,
     OMX_VIDEO_VP9Profile3HDR = 0x2000,
-    OMX_VIDEO_VP9Profile2HDR10Plus = 0x4000,
-    OMX_VIDEO_VP9Profile3HDR10Plus = 0x8000,
     OMX_VIDEO_VP9ProfileUnknown = 0x6EFFFFFF,
     OMX_VIDEO_VP9ProfileMax = 0x7FFFFFFF
 } OMX_VIDEO_VP9PROFILETYPE;
@@ -218,7 +216,6 @@ typedef enum OMX_VIDEO_HEVCPROFILETYPE {
     OMX_VIDEO_HEVCProfileMainStill    = 0x4,
     // Main10 profile with HDR SEI support.
     OMX_VIDEO_HEVCProfileMain10HDR10  = 0x1000,
-    OMX_VIDEO_HEVCProfileMain10HDR10Plus  = 0x2000,
     OMX_VIDEO_HEVCProfileMax     = 0x7FFFFFFF
 } OMX_VIDEO_HEVCPROFILETYPE;
 
@@ -441,17 +438,12 @@ typedef struct OMX_PARAM_S32TYPE {
     OMX_S32 nS32;                     /**< S32 value */
 } OMX_PARAM_S32TYPE;
 
-/**
- *  MTK SPECIFIC SCENARIO = [16-bits reserved][8-bits App ID][8-bits Scenario ID]
- *  App ID = 0x00 MediaTek
- *  App ID = 0x01 WeChat
- */
+/** MTK SPECIFIC SCENARIO */
 typedef enum OMX_VIDEO_MTK_SPECIFIC_SCENARIOTYPE {
     OMX_VIDEO_MTKSpecificScenario_Unknown       = 0x0,
     OMX_VIDEO_MTKSpecificScenario_LivePhoto     = 0x1,
     OMX_VIDEO_MTKSpecificScenario_ViLTE         = 0x2,
     OMX_VIDEO_MTKSpecificScenario_CrossMount    = 0x4,
-    OMX_VIDEO_MTKSpecificScenario_WeChatCameraRecord = 0x101,
     OMX_VIDEO_MTKSpecificScenarioMax            = 0x7FFFFFFF
 } OMX_VIDEO_MTK_SPECIFIC_SCENARIOTYPE;
 
@@ -499,14 +491,7 @@ typedef struct OMX_VIDEO_PARAM_ANDROID_IMAGEGRIDTYPE {
     OMX_U32 nGridCols;
 } OMX_VIDEO_PARAM_ANDROID_IMAGEGRIDTYPE;
 
-typedef struct OMX_VIDEO_CONFIG_ROI_INFO {
-    OMX_U32 nSize;
-    OMX_VERSIONTYPE nVersion;
-    OMX_U32 nRoiInfoSize;
-    OMX_U32 nRoiStringSize;
-    OMX_U16 nRoiBaseQp;
-    OMX_U8 pRoiInfoCheck[4];
-} OMX_VIDEO_CONFIG_ROI_INFO;
+
 
 #ifdef __cplusplus
 }

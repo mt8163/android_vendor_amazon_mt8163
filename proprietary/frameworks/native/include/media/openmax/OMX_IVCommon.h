@@ -187,12 +187,6 @@ typedef enum OMX_COLOR_FORMATTYPE {
     OMX_COLOR_FormatVendorMTKYUV_10BIT_V = 0x7F000005,
     OMX_COLOR_FormatVendorMTKYUV_UFO_10BIT_H = 0x7F000006,
     OMX_COLOR_FormatVendorMTKYUV_UFO_10BIT_V = 0x7F000007,
-    OMX_COLOR_FormatVendorMTKYUV_10BIT_H_JUMP = 0x7F000008,
-    OMX_COLOR_FormatVendorMTKYUV_10BIT_V_JUMP = 0x7F000009,
-    OMX_COLOR_FormatVendorMTKYUV_UFO_10BIT_H_JUMP = 0x7F00000A,
-    OMX_COLOR_FormatVendorMTKYUV_UFO_10BIT_V_JUMP = 0x7F00000B,
-    OMX_COLOR_FormatVendorMTKYUV_UFO_AUO = 0x7F00000C,
-
     /**<Reserved android opaque colorformat. Tells the encoder that
      * the actual colorformat will be  relayed by the
      * Gralloc Buffers.
@@ -202,7 +196,6 @@ typedef enum OMX_COLOR_FORMATTYPE {
      * */
     OMX_COLOR_FormatAndroidOpaque = 0x7F000789,
     OMX_COLOR_Format32BitRGBA8888 = 0x7F00A000,
-    OMX_COLOR_Format32BitABGR8888 = 0x7F00B000,
     /** Flexible 8-bit YUV format.  Codec should report this format
      *  as being supported if it supports any YUV420 packed planar
      *  or semiplanar formats.  When port is set to use this format,

@@ -623,9 +623,6 @@ typedef enum OMX_EVENTTYPE
      */
     OMX_EventOutputRendered = 0x7F000001,
     OMX_EventDataSpaceChanged,
-
-    OMX_EventConfigUpdate,
-
     OMX_EventMax = 0x7FFFFFFF
 } OMX_EVENTTYPE;
 

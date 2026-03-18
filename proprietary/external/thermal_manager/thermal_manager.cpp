@@ -39,7 +39,7 @@
  *
  * Filename:
  * ---------
- *      thermal_manager.c
+ *      thermal_manager.cpp
  *
  * Project:
  * --------
@@ -55,89 +55,100 @@
  *      CT Fang (mtk02403)
  *
  ****************************************************************************/
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <cutils/properties.h>
-#include <android/log.h>
-#include <sys/ioctl.h>
-#include <errno.h>
+
+#include <iostream>
+#include <memory>
+#include <string>
+#include <vector>
 #include <dlfcn.h>
-#include <log/log.h>
+#include <cstdlib>
+#include <android/log.h>
 
-
-#define MTK_LOG_ENABLE	(1)
-#define TM_LOG_TAG "thermal_mgr"
-
-#if MTK_LOG_ENABLE
-#define TM_LOG(_priority_, _fmt_, args...)  LOG_PRI(_priority_, TM_LOG_TAG, _fmt_, ##args)
-
-#else
-#define TM_LOG(_priority_, _fmt_, args...)
-#endif
-
-int (*loadmtc)(char *) = NULL;
+#define TM_LOG_TAG "thermal_mgr_cpp"
 #define LIB_FULL_NAME "/vendor/lib/libmtcloader.so"
-typedef int (*load)(char *);
+#define DEFAULT_THERMAL_CONF "/vendor/etc/.tp/thermal.conf"
 
-int (*loadchange_policy)(char *, int) = NULL;
-typedef int (*load_change_policy)(char *, int);
+#define TM_LOG(priority, fmt, ...) \
+    __android_log_print(priority, TM_LOG_TAG, fmt, ##__VA_ARGS__)
 
-int main(int argc, char **argv)
-{
-    int i = 0;
-    void *handle, *func, *func2;
+namespace thermal {
 
-    TM_LOG(ANDROID_LOG_INFO, "%s argc %d.\n", __func__, argc);
-    for (; i < argc; i++) {
-        TM_LOG(ANDROID_LOG_INFO, "argv[%d] %s.\n", i, argv[i]);
+// Type aliases for dynamically loaded function pointers
+using LoadMtcFunc = int(*)(const char *);
+using ChangePolicyFunc = int(*)(const char *, int);
+
+class ThermalManager {
+public:
+    ThermalManager() = default;
+    ~ThermalManager() {
+        if (lib_handle_) {
+            dlclose(lib_handle_);
+        }
     }
 
-    handle = dlopen(LIB_FULL_NAME, RTLD_NOW);
-    /* TM_LOG(ANDROID_LOG_INFO, "dlopen.\n"); */
-	if (handle == NULL) {
-		TM_LOG(ANDROID_LOG_ERROR, "fails to load lib err: %s.\n", dlerror());
-		return -1;
-	}
+    int run(const std::vector<std::string>& args);
 
-	func = dlsym(handle, "loadmtc");
-	loadmtc = (load)func;
+private:
+    void* lib_handle_ = nullptr;
+    LoadMtcFunc load_mtc_ = nullptr;
+    ChangePolicyFunc change_policy_ = nullptr;
 
-	if (loadmtc == NULL) {
-        TM_LOG(ANDROID_LOG_ERROR, "loadmtc err: %s.\n", dlerror());
-		dlclose(handle);
-		return -1;
-	}
+    bool loadLibrary();
+    bool loadFunctions();
+    int executePolicy(const std::vector<std::string>& args);
+};
 
-    if (argc - 1 > 0) {
-        int ret = 0;
+bool ThermalManager::loadLibrary() {
+    lib_handle_ = dlopen(LIB_FULL_NAME, RTLD_NOW);
+    if (!lib_handle_) {
+        TM_LOG(ANDROID_LOG_ERROR, "Failed to load %s: %s", LIB_FULL_NAME, dlerror());
+        return false;
+    }
+    return true;
+}
 
-        if (argc == 2) {
-            TM_LOG(ANDROID_LOG_INFO, "loadmtc %s\n", argv[1]);
-            ret = loadmtc(argv[1]);
-        } else if (argc == 3) {
-  	    func2 = dlsym(handle, "change_policy");
-  	    loadchange_policy = (load_change_policy)func2;
+bool ThermalManager::loadFunctions() {
+    load_mtc_ = reinterpret_cast<LoadMtcFunc>(dlsym(lib_handle_, "loadmtc"));
+    if (!load_mtc_) {
+        TM_LOG(ANDROID_LOG_ERROR, "loadmtc not found: %s", dlerror());
+        return false;
+    }
 
-    	    if (loadchange_policy == NULL) {
-                TM_LOG(ANDROID_LOG_ERROR, "change_policy err: %s.\n", dlerror());
-    		dlclose(handle);
-    		return -1;
-    	    }
-    	    ret = loadchange_policy(argv[1], atoi(argv[2]));
-            TM_LOG(ANDROID_LOG_INFO, "change_policy ret: %d.\n", ret);
- 	}
-	dlclose(handle);
-        return ret;
+    change_policy_ = reinterpret_cast<ChangePolicyFunc>(dlsym(lib_handle_, "change_policy"));
+    return true;
+}
+
+int ThermalManager::executePolicy(const std::vector<std::string>& args) {
+    if (args.size() == 2) {
+        TM_LOG(ANDROID_LOG_INFO, "Invoking loadmtc with: %s", args[1].c_str());
+        return load_mtc_(args[1].c_str());
+    } else if (args.size() == 3 && change_policy_) {
+        int policy = std::stoi(args[2]);
+        TM_LOG(ANDROID_LOG_INFO, "Invoking change_policy: %s %d", args[1].c_str(), policy);
+        return change_policy_(args[1].c_str(), policy);
     } else {
-        TM_LOG(ANDROID_LOG_INFO, "loadmtc thermal.conf\n");
-        int ret = loadmtc("/vendor/etc/.tp/thermal.conf"); /* default policy */
-        dlclose(handle);
-        return ret;
+        TM_LOG(ANDROID_LOG_INFO, "Using default config: %s", DEFAULT_THERMAL_CONF);
+        return load_mtc_(DEFAULT_THERMAL_CONF);
     }
+}
+
+int ThermalManager::run(const std::vector<std::string>& args) {
+    for (size_t i = 0; i < args.size(); ++i) {
+        TM_LOG(ANDROID_LOG_INFO, "argv[%zu]: %s", i, args[i].c_str());
+    }
+
+    if (!loadLibrary() || !loadFunctions()) {
+        return EXIT_FAILURE;
+    }
+
+    return executePolicy(args);
+}
+
+}  // namespace thermal
+
+int main(int argc, char** argv) {
+    std::vector<std::string> args(argv, argv + argc);
+    thermal::ThermalManager manager;
+    return manager.run(args);
 }
 
