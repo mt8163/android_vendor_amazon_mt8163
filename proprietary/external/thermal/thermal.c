@@ -547,7 +547,7 @@ static int load_thm_api(int idx, bool start)
 {
 
     void *handle, *func;
-    char strParam[18] = {0};
+    char strParam[20] = {0};
     int ret = 0;
 
     handle = dlopen(THM_LIB_FULL_NAME, RTLD_NOW);
