@@ -25,3 +25,11 @@ MTK_PATH_CUSTOM := vendor/amazon/mt8163/proprietary/custom/$(MTK_PROJECT)
 MTK_PATH_SOURCE := vendor/amazon/mt8163/proprietary
 MTK_ROOT := vendor/amazon/mt8163/proprietary
 
+# Kernel
+TARGET_KERNEL_SOURCE ?= kernel/amazon/karnak
+TARGET_KERNEL_ARCH ?= arm64
+TARGET_KERNEL_CLANG_COMPILE ?= false
+AMAZON_KERNEL_CROSS_COMPILE_PREFIX ?= $(abspath prebuilts/linaro/linux-x86/aarch64/aarch64-linux-gnu/bin/aarch64-linux-gnu-)
+AMAZON_KERNEL_CROSS_COMPILE_ARM32_PREFIX ?= $(abspath prebuilts/gcc/$(HOST_PREBUILT_TAG)/arm/arm-linux-androideabi-4.9/bin/arm-linux-androideabi-)
+TARGET_KERNEL_CROSS_COMPILE_PREFIX ?= $(abspath prebuilts/linaro/linux-x86/aarch64/aarch64-linux-gnu/bin/aarch64-linux-gnu-)
+TARGET_KERNEL_CROSS_COMPILE_ARM32_PREFIX ?= $(abspath prebuilts/gcc/$(HOST_PREBUILT_TAG)/arm/arm-linux-androideabi-4.9/bin/arm-linux-androideabi-)
