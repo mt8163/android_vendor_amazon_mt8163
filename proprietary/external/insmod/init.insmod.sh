@@ -14,6 +14,8 @@ kmsg_log() {
   echo "init.insmod: $1" > /dev/kmsg
 }
 
+kmsg_log "Starting module loading..."
+
 if [ -f $cfg_file ]; then
   while IFS=" " read -r action name
   do
@@ -23,6 +25,8 @@ if [ -f $cfg_file ]; then
     esac
   done < $cfg_file
 fi
+
+kmsg_log "Module loading completed."
 
 # set property even if there is no insmod config
 # as property value "1" is expected in early-boot trigger
