@@ -17,11 +17,16 @@ kmsg_log() {
 kmsg_log "Starting module loading..."
 
 if [ -f $cfg_file ]; then
+  kmsg_log "Processing config file: $cfg_file"
   while IFS=" " read -r action name
   do
     case $action in
-      "insmod") insmod $name ;;
-      "setprop") setprop $name 1 ;;
+      "insmod")
+        kmsg_log "Loading module (cfg): $name"
+        insmod $name ;;
+      "setprop")
+        kmsg_log "Setting property: $name"
+        setprop $name 1 ;;
     esac
   done < $cfg_file
 fi
