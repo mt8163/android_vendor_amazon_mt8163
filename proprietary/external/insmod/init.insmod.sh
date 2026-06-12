@@ -8,6 +8,7 @@
 #########################################
 
 cfg_file="/vendor/etc/init.insmod.cfg"
+load_file="/vendor/lib/modules/modules.load"
 
 if [ -f $cfg_file ]; then
   while IFS=" " read -r action name
