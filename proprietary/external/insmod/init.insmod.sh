@@ -23,10 +23,12 @@ if [ -f $cfg_file ]; then
     case $action in
       "insmod")
         kmsg_log "Loading module (cfg): $name"
-        insmod $name ;;
+        insmod $name || kmsg_log "Failed to load $name"
+        ;;
       "setprop")
         kmsg_log "Setting property: $name"
-        setprop $name 1 ;;
+        setprop $name 1
+        ;;
     esac
   done < $cfg_file
 fi
