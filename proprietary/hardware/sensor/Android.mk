@@ -84,6 +84,7 @@ LOCAL_SRC_FILES := \
 
 LOCAL_C_INCLUDES+= \
         $(MTK_PATH_SOURCE)/hardware/sensor/ \
+        $(MTK_PATH_SOURCE)/hardware/include \
         $(MTK_PATH_CUSTOM)/hal/sensors/sensor \
         $(TOP)/frameworks/av/media/libstagefright/include \
         $(LOCAL_PATH)/include
