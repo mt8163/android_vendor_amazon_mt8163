@@ -46,7 +46,9 @@ private:
     char input_sysfs_path[PATH_MAX];
     int input_sysfs_path_len;
     int mDataDiv[MAX_BIOMETRIC_SUPPORT];
+#ifdef HAVE_AEE_FEATURE
     float sn[MAX_BIOMETRIC_SUPPORT];
+#endif
 
     void processEvent(struct sensor_event const *event);
     int HandleToIndex(int handle);
