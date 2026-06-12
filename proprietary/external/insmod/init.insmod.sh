@@ -10,6 +10,10 @@
 cfg_file="/vendor/etc/init.insmod.cfg"
 load_file="/vendor/lib/modules/modules.load"
 
+kmsg_log() {
+  echo "init.insmod: $1" > /dev/kmsg
+}
+
 if [ -f $cfg_file ]; then
   while IFS=" " read -r action name
   do
