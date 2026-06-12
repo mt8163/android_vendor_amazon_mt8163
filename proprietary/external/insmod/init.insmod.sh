@@ -33,6 +33,23 @@ if [ -f $cfg_file ]; then
   done < $cfg_file
 fi
 
+if [ -f "$load_file" ]; then
+  kmsg_log "Processing load file: $load_file"
+  while read -r module; do
+    case "$module" in
+      ""|"#"*) continue ;;
+    esac
+    kmsg_log "Loading module: $module"
+    if ! insmod "/vendor/lib/modules/$module"; then
+      if ! grep -q "^${module%.*} " /proc/modules; then
+        kmsg_log "Error: Failed to load $module"
+      else
+        kmsg_log "Module $module already loaded, skipping."
+      fi
+    fi
+  done < "$load_file"
+fi
+
 kmsg_log "Module loading completed."
 
 # set property even if there is no insmod config
