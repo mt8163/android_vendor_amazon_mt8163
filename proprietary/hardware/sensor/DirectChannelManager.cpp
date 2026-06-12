@@ -255,14 +255,14 @@ int64_t DirectChannelManager::rateLevelToDeviceSamplingPeriodNs(int handle, int 
     switch (rateLevel) {
         case SENSOR_DIRECT_RATE_VERY_FAST:
             // No sensor support VERY_FAST, fall through
+            [[fallthrough]];
         case SENSOR_DIRECT_RATE_FAST:
             if (handle != ID_MAGNETIC && handle != ID_MAGNETIC_UNCALIBRATED) {
                 return 2500000; // 400Hz
             }
-            // fall through
+            [[fallthrough]];
         case SENSOR_DIRECT_RATE_NORMAL:
             return 20000000; // 50 Hz
-            // fall through
         default:
             return INT64_MAX;
     }
